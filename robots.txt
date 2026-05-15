@@ -1,0 +1,7 @@
+# Trusty Water — robots.txt
+# Replace https://trustywater.com with your actual domain.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://trustywater.com/sitemap.xml
