@@ -29,17 +29,18 @@ body::before{ /* ambient brand wash */
 
 /* ---------- top bar ---------- */
 .topbar{display:flex;align-items:center;gap:18px;padding:16px 26px 12px;border-bottom:1px solid var(--line-soft)}
-.who{display:flex;align-items:center;gap:11px;min-width:0}
+.who{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
+.who > div{min-width:0}
 .avatar{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;
   background:linear-gradient(140deg,var(--accent),var(--accent2));color:#0b0b0d;font-weight:700;font-size:12.5px;letter-spacing:.02em}
 .who-name{font-weight:640;font-size:16px;letter-spacing:-.01em;white-space:nowrap}
-.who-title{font-size:12.5px;color:var(--faint);white-space:nowrap}
-.cobrand{margin-left:auto;display:flex;align-items:center;gap:13px}
+.who-title{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cobrand{margin-left:auto;display:flex;align-items:center;gap:13px;flex:none}
 .cobrand-label{font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:var(--faint)}
 .cobrand-rule{width:1px;height:26px;background:var(--line)}
 .cobrand-mark{font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
 .cobrand-mark img{max-height:26px;width:auto;display:block}
-.badge-draft{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#0b0b0d;background:#F5C451;
+.badge-draft{flex:none;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#0b0b0d;background:#F5C451;
   padding:3px 8px;border-radius:99px;font-weight:700}
 
 /* ---------- body split ---------- */
@@ -234,7 +235,7 @@ body::before{ /* ambient brand wash */
   .topbar{padding:14px 20px 10px;gap:12px}
   .narrative{border-right:0;border-bottom:1px solid var(--line-soft);padding:22px 20px}
   .map{overflow:visible}
-  .map-scroll{height:auto;overflow:visible;padding:18px 20px 22px}
+  .map-scroll{height:auto;overflow:visible;padding:18px 20px 78px}
   .map-inner{height:auto;transform:none!important;width:100%!important;gap:22px}
   .map .edge{display:none}
   .zone-label{position:static}
