@@ -55,7 +55,7 @@ async function build(over = {}) {
     console.error(dim("\nFix them, or pass --force to build anyway."));
     process.exit(1);
   }
-  const html = render({ deal, brand, presenter });
+  const html = render({ deal, brand, presenter, artifact: !!(over.artifact || flag("artifact")) });
   fs.mkdirSync(P.dist, { recursive: true });
   const outFlag = over.out || flag("out");
   const out = !outFlag || outFlag === true
@@ -131,6 +131,7 @@ function list() {
 const help = `${bold("dealmap")} — deal-review visuals for interviews
 
   ${bold("build")}   --deal <slug> --brand <id> [--out file]   render one self-contained HTML deck
+          [--artifact]                              body-only form, for publishing as an Artifact
   ${bold("build-all")} --deal <slug>                           render the deck for every brand
   ${bold("check")}   --deal <slug> [--brand <id>] [--json]     run the evaluation suite
   ${bold("new")}     --deal <slug>                             scaffold a new deal from the example

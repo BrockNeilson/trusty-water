@@ -146,30 +146,22 @@ function footer(d) {
   </footer>`;
 }
 
-export function render({ deal, brand, presenter }) {
+export function render({ deal, brand, presenter, artifact = false }) {
   const d = deal;
-  const title = `${d.meta.dealName} — Deal Review${brand.company ? " · " + brand.company : ""}`;
+  const title = `${d.meta.dealName} Deal Map`;
   const payload = {
     meta: d.meta,
     steps: d.steps,
     _edges: d._edges
   };
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${esc(title)}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  const head = `<title>${esc(title)}</title>
 <link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(brand.font || "Inter")}:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 ${themeVars(brand)}
 ${asset("styles.css")}
-</style>
-</head>
-<body>
-<div class="stage">
+</style>`;
+
+  const body = `<div class="stage">
   ${topbar(presenter, brand, d.meta)}
   <div class="body">
     <section class="narrative anim-in" id="narrative">${narrative(d.steps[0] || { title: "" })}</section>
@@ -195,7 +187,21 @@ const PRESENTER = ${JSON.stringify(presenter).replace(/</g, "\\u003c")};
 </script>
 <script>
 ${asset("app.js")}
-</script>
+</script>`;
+
+  // Artifact pages are wrapped in their own document skeleton at publish time.
+  if (artifact) return `${head}\n${body}`;
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+${head}
+</head>
+<body>
+${body}
 </body>
 </html>`;
 }
