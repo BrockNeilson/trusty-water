@@ -29,6 +29,7 @@ export function dashboardPage() {
 ${asset("desk.html")}
 <script>${core()}</script>
 <script>${asset("store-http.js")}</script>
+<script>${asset("desk-forms.js")}</script>
 <script>${asset("desk-ui.js")}</script>
 </body>
 </html>`;

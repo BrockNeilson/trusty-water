@@ -39,9 +39,12 @@ interviewer's laptop actually is, scaled down, so what you see is what they will
 | tab | what it edits |
 |---|---|
 | **Notes** | `data/notes/<slug>.md` — autosaves as you type |
-| **Story** | `data/deals/<slug>.json` — refuses to save invalid JSON or a broken reference, and tells you which |
+| **Story** | the steps: beat, kicker, title, three bullets, presenter note, and the spotlight picked from chips — a broken reference cannot be typed |
+| **Map** | the people, obstacles, deal path, result tiles and MEDDPICC, as forms. Removing someone cleans every reference to them |
 | **Audience** | the white-label: company, wordmark, label, logo (drag and drop), and the five-colour scheme with a live contrast readout |
 | **Checks** | the eval suite, inline, with the score |
+
+Both editing tabs keep an **Edit as JSON** escape hatch for when a form is slower than typing.
 
 **New deal** creates the deal file and its notes file together. **Share** offers the two honest
 options: download the self-contained HTML to email or carry on a stick, or write both forms to

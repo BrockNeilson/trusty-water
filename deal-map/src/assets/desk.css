@@ -191,3 +191,36 @@ textarea[disabled],input[disabled],select[disabled]{opacity:.7;cursor:not-allowe
   .pane{border-right:0}
   textarea.notes,textarea.json{min-height:52vh}
 }
+
+/* ---------- structured editors ---------- */
+.form-scroll{display:flex;flex-direction:column;gap:22px}
+.form-block{display:flex;flex-direction:column;gap:9px}
+.zone-head{display:flex;align-items:center;gap:12px}
+.zone-head h3{font-family:var(--display);font-size:15px;font-weight:600;letter-spacing:-.01em;font-optical-sizing:auto}
+.zone-head .hint{margin-left:auto;text-align:right;max-width:60%}
+.zone-head .btn{margin-left:auto}
+.zone-head .hint + .btn{margin-left:0}
+.row-card{border:1px solid var(--edge);border-radius:12px;background:var(--panel);padding:12px}
+.row-head{display:flex;align-items:center;gap:9px;margin-bottom:10px}
+.row-head b{font-size:13px;font-weight:600}
+.row-head code{font-size:10.5px;color:var(--faint);font-family:var(--mono)}
+.row-head .btn{margin-left:0}
+.row-head .btn:first-of-type{margin-left:auto}
+.row-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.row-grid .f{display:flex;flex-direction:column;gap:4px;min-width:0}
+.row-grid .f label{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--faint)}
+.row-grid input[type=text],.row-grid input[type=number],.row-grid select{padding:6px 8px;font-size:12.5px}
+.chk{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);align-self:end;padding-bottom:6px}
+.chk input{accent-color:var(--brass)}
+.empty-row{padding:10px 2px}
+
+.spotlight-pick{border-top:1px dashed var(--edge);margin-top:11px;padding-top:10px;display:flex;flex-direction:column;gap:7px}
+.chip-row{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.chip-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.11em;color:var(--faint);min-width:74px}
+.pickchip{border:1px solid var(--edge);background:transparent;color:var(--muted);border-radius:99px;
+  padding:3px 10px;font-size:11.5px;cursor:pointer;transition:.15s;font:inherit;font-size:11.5px}
+.pickchip:hover{border-color:var(--brass-dim);color:var(--ink)}
+.pickchip.on{background:var(--brass);border-color:var(--brass);color:#1A1508;font-weight:600}
+.chip-row select{width:auto;padding:4px 8px;font-size:11.5px}
+[data-ro] input,[data-ro] select,[data-ro] .pickchip,[data-ro] .btn{pointer-events:none;opacity:.65}
+@media (max-width:1200px){ .row-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .row-grid .f{grid-column:span 2!important} }

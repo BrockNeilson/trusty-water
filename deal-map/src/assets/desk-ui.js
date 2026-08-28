@@ -134,12 +134,15 @@
         '<div class="hint">Prose, fragments, a pasted transcript — the source the deal is written from.</div>' +
         '<textarea class="notes" id="notes"' + dis + ">" + esc(S.state.notes[cur] || "") + "</textarea></div>";
     } else if (name === "story") {
-      body.innerHTML = '<div class="field"><label>Deal file <span class="saving" id="story-saved"></span></label>' +
-        '<div class="hint">Invalid JSON or a broken reference will not apply — the error says which.</div>' +
-        '<textarea class="json" id="story" spellcheck="false"' + dis + ">" +
-        esc(JSON.stringify(S.state.deals[cur], null, 2)) + "</textarea>" +
-        (ro() ? "" : '<div class="modal-actions"><button class="btn" id="story-revert">Revert</button>' +
-          '<button class="btn primary" id="story-apply">Apply</button></div>') + "</div>";
+      body.innerHTML = rawMode
+        ? rawEditor()
+        : '<div class="form-scroll"' + (ro() ? " data-ro" : "") + ">" +
+          DESKFORMS.storyHtml(S.state.deals[cur]) + "</div>" + rawToggle();
+    } else if (name === "map") {
+      body.innerHTML = rawMode
+        ? rawEditor()
+        : '<div class="form-scroll"' + (ro() ? " data-ro" : "") + ">" +
+          DESKFORMS.mapHtml(S.state.deals[cur]) + "</div>" + rawToggle();
     } else if (name === "audience") {
       body.innerHTML = audienceTab();
     } else {
@@ -189,6 +192,46 @@
             (f.at ? '<span class="at">' + esc(f.at) + "</span> " : "") + esc(f.msg) + "</span></div>";
         }).join("") + "</div>";
       }).join("");
+  }
+
+  var rawMode = false;
+
+  function rawToggle() {
+    return '<div class="modal-actions"><button class="btn sm ghost" id="raw-toggle">' +
+      (rawMode ? "Back to the editor" : "Edit as JSON") + "</button></div>";
+  }
+
+  function rawEditor() {
+    return '<div class="field"><label>Deal file <span class="saving" id="story-saved"></span></label>' +
+      '<div class="hint">The escape hatch. Invalid JSON or a broken reference will not apply.</div>' +
+      '<textarea class="json" id="story" spellcheck="false"' + (ro() ? " disabled" : "") + ">" +
+      esc(JSON.stringify(S.state.deals[cur], null, 2)) + "</textarea>" +
+      (ro() ? "" : '<div class="modal-actions"><button class="btn" id="story-revert">Revert</button>' +
+        '<button class="btn primary" id="story-apply">Apply</button></div>') + "</div>" + rawToggle();
+  }
+
+  // Structured edits go straight into the deal, then through the store like any other change.
+  function commitForm(rerender) {
+    var deal = S.state.deals[cur];
+    S.updateDeal(cur, deal).then(function () {
+      paintSaveState();
+      refreshPreview();
+      if (rerender) setTab(tab);
+    }).catch(fail);
+  }
+
+  function wireForms() {
+    var scope = $(".form-scroll");
+    if (!scope || ro()) return;
+    scope.addEventListener("input", function (e) {
+      if (DESKFORMS.apply(S.state.deals[cur], e)) debounce("form", function () { commitForm(false); }, 450);
+    });
+    scope.addEventListener("change", function (e) {
+      if (DESKFORMS.apply(S.state.deals[cur], e)) commitForm(false);
+    });
+    scope.addEventListener("click", function (e) {
+      if (DESKFORMS.click(S.state.deals[cur], e)) { e.preventDefault(); commitForm(true); }
+    });
   }
 
   function contrastLine() {
@@ -247,6 +290,10 @@
   /* ---------------- wiring ---------------- */
 
   function wireTab() {
+    if ($("#raw-toggle")) {
+      $("#raw-toggle").addEventListener("click", function () { rawMode = !rawMode; setTab(tab); });
+    }
+    wireForms();
     if (ro()) return;
     var n = $("#notes");
     if (n) {
@@ -482,7 +529,7 @@
       }
     }
     var parts = (location.hash || "").slice(1).split("/");
-    if (parts[1] && ["notes", "story", "audience", "checks"].indexOf(parts[1]) > -1) tab = parts[1];
+    if (parts[1] && ["notes", "story", "map", "audience", "checks"].indexOf(parts[1]) > -1) tab = parts[1];
     renderDesk();
     if (parts[0] && S.state.deals[parts[0]]) openDeal(parts[0]);
     // Write access can resolve after boot; re-render when it does.

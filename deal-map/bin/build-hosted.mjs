@@ -82,6 +82,9 @@ ${safe(engine)}
 ${safe(read("src/assets/store-page.js"))}
 </script>
 <script>
+${safe(read("src/assets/desk-forms.js"))}
+</script>
+<script>
 ${safe(read("src/assets/desk-ui.js"))}
 </script>
 </body>
