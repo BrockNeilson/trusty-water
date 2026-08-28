@@ -1,0 +1,14 @@
+{
+  "id": "default",
+  "company": "",
+  "wordmark": "",
+  "logo": null,
+  "preparedForLabel": "Deal Review",
+  "accent": "#5B8DEF",
+  "accent2": "#9B7BF0",
+  "bg": "#0B0E14",
+  "surface": "#141922",
+  "ink": "#E8EDF5",
+  "font": "Inter",
+  "note": "Neutral house theme. Used when no --brand is passed."
+}

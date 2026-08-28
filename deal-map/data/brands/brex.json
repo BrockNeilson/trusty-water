@@ -1,0 +1,14 @@
+{
+  "id": "brex",
+  "company": "Brex",
+  "wordmark": "Brex",
+  "logo": null,
+  "preparedForLabel": "Prepared for",
+  "accent": "#F26D3D",
+  "accent2": "#FFB088",
+  "bg": "#0A0A0B",
+  "surface": "#16161A",
+  "ink": "#F2F1EF",
+  "font": "Inter",
+  "note": "Drop a logo file at data/brands/logos/brex.svg (or .png) and set \"logo\": \"logos/brex.svg\" to swap the wordmark for the real mark."
+}

@@ -1,0 +1,469 @@
+{
+  "meta": {
+    "slug": "northwind",
+    "draft": true,
+    "dealName": "Northwind Logistics",
+    "customer": "Northwind Logistics",
+    "industry": "Freight & 3PL · 14,000 employees",
+    "product": "Spend & Expense Platform",
+    "acv": "$1.24M",
+    "tcv": "$3.7M",
+    "termMonths": 36,
+    "cycleDays": 187,
+    "outcome": "Closed Won",
+    "closedDate": "2025-11-14",
+    "oneLiner": "A stalled competitive displacement, restarted by finding the real economic buyer.",
+    "targetMinutes": 6
+  },
+  "metrics": [
+    {
+      "label": "ACV",
+      "value": "$1.24M",
+      "sub": "3-yr TCV $3.7M"
+    },
+    {
+      "label": "Cycle",
+      "value": "187 days",
+      "sub": "31 days under team avg"
+    },
+    {
+      "label": "Incumbent",
+      "value": "Displaced",
+      "sub": "6-yr renewal cycle broken"
+    },
+    {
+      "label": "Expansion",
+      "value": "+$410K",
+      "sub": "Booked in month 7"
+    }
+  ],
+  "stakeholders": [
+    {
+      "id": "cfo",
+      "name": "Dana Okafor",
+      "title": "CFO",
+      "org": "Finance",
+      "role": "economic_buyer",
+      "influence": 3,
+      "sentiment": 2,
+      "note": "Owns the number. Cared about audit risk, not features."
+    },
+    {
+      "id": "vpfin",
+      "name": "Marcus Hale",
+      "title": "VP Finance",
+      "org": "Finance",
+      "role": "champion",
+      "influence": 3,
+      "sentiment": 2,
+      "reportsTo": "cfo",
+      "note": "Built the business case with me. Sold internally when I couldn't."
+    },
+    {
+      "id": "ctrl",
+      "name": "Priya Raman",
+      "title": "Controller",
+      "org": "Finance",
+      "role": "coach",
+      "influence": 2,
+      "sentiment": 1,
+      "reportsTo": "cfo",
+      "note": "Fed me the close-process pain, week by week."
+    },
+    {
+      "id": "ciso",
+      "name": "Tom Byrne",
+      "title": "CISO",
+      "org": "IT & Security",
+      "role": "technical_buyer",
+      "influence": 3,
+      "sentiment": 0,
+      "note": "Hard no until SOC 2 scope and SSO were proven."
+    },
+    {
+      "id": "itdir",
+      "name": "Sam Ellis",
+      "title": "Dir. Enterprise Apps",
+      "org": "IT & Security",
+      "role": "technical_buyer",
+      "influence": 2,
+      "sentiment": 1,
+      "reportsTo": "ciso",
+      "note": "Owned the NetSuite integration risk."
+    },
+    {
+      "id": "opsvp",
+      "name": "Lena Cruz",
+      "title": "VP Field Operations",
+      "org": "Operations",
+      "role": "user_buyer",
+      "influence": 2,
+      "sentiment": 2,
+      "note": "2,400 drivers on paper receipts. Loudest advocate."
+    },
+    {
+      "id": "proc",
+      "name": "Gil Anders",
+      "title": "Dir. Procurement",
+      "org": "Procurement",
+      "role": "blocker",
+      "influence": 2,
+      "sentiment": -2,
+      "note": "Incumbent relationship. Ran the process to protect it."
+    },
+    {
+      "id": "legal",
+      "name": "Ava Sterling",
+      "title": "Assoc. General Counsel",
+      "org": "Procurement",
+      "role": "influencer",
+      "influence": 1,
+      "sentiment": 0,
+      "reportsTo": "proc",
+      "note": "DPA and liability cap. Two weeks of the cycle."
+    }
+  ],
+  "obstacles": [
+    {
+      "id": "o-incumbent",
+      "type": "competitive",
+      "title": "Six-year incumbent",
+      "detail": "Procurement had auto-renewed since 2019.",
+      "resolution": "Reframed on audit findings, not price.",
+      "status": "cleared",
+      "owner": "proc"
+    },
+    {
+      "id": "o-champion",
+      "type": "political",
+      "title": "Champion went quiet",
+      "detail": "Reorg moved my champion off the project.",
+      "resolution": "Re-anchored on the CFO's board commitment.",
+      "status": "cleared",
+      "owner": "vpfin"
+    },
+    {
+      "id": "o-security",
+      "type": "technical",
+      "title": "Security review",
+      "detail": "CISO blocked pending SOC 2 scope + SCIM.",
+      "resolution": "Ran a joint architecture session in week 9.",
+      "status": "cleared",
+      "owner": "ciso"
+    },
+    {
+      "id": "o-erp",
+      "type": "technical",
+      "title": "NetSuite integration",
+      "detail": "Custom GL dimensions, 11 subsidiaries.",
+      "resolution": "Scoped a 3-week pilot on one subsidiary.",
+      "status": "cleared",
+      "owner": "itdir"
+    },
+    {
+      "id": "o-budget",
+      "type": "commercial",
+      "title": "No budget line",
+      "detail": "Spend sat inside three cost centers.",
+      "resolution": "Funded from audit remediation budget.",
+      "status": "cleared",
+      "owner": "cfo"
+    },
+    {
+      "id": "o-legal",
+      "type": "legal",
+      "title": "Liability cap standoff",
+      "detail": "Legal wanted 3x fees; we cap at 1x.",
+      "resolution": "Traded cap for a shorter cure period.",
+      "status": "cleared",
+      "owner": "legal"
+    }
+  ],
+  "meddpicc": {
+    "metrics": {
+      "score": 3,
+      "headline": "11 days to close the books",
+      "proof": "Target: 5 days. $2.1M in unreconciled spend."
+    },
+    "economicBuyer": {
+      "score": 3,
+      "headline": "CFO, met in week 6",
+      "proof": "Board had committed to a clean FY26 audit."
+    },
+    "decisionCriteria": {
+      "score": 3,
+      "headline": "Audit trail over features",
+      "proof": "We wrote the criteria with the Controller."
+    },
+    "decisionProcess": {
+      "score": 2,
+      "headline": "Security → Legal → CFO sign-off",
+      "proof": "Mapped in week 7. Legal was the hidden gate."
+    },
+    "paperProcess": {
+      "score": 2,
+      "headline": "DPA + 3-week security review",
+      "proof": "Started legal in parallel, not after."
+    },
+    "identifyPain": {
+      "score": 3,
+      "headline": "Failed audit control",
+      "proof": "Two repeat findings on expense approvals."
+    },
+    "champion": {
+      "score": 3,
+      "headline": "VP Finance, tested twice",
+      "proof": "He ran the internal readout without me."
+    },
+    "competition": {
+      "score": 2,
+      "headline": "Incumbent + status quo",
+      "proof": "Displacement framed as risk removal."
+    }
+  },
+  "timeline": [
+    {
+      "id": "t1",
+      "label": "Cold outbound",
+      "date": "May 12",
+      "stage": "Discovery"
+    },
+    {
+      "id": "t2",
+      "label": "Pain confirmed",
+      "date": "Jun 03",
+      "stage": "Discovery"
+    },
+    {
+      "id": "t3",
+      "label": "Deal stalls",
+      "date": "Jul 09",
+      "stage": "Stalled",
+      "flag": true
+    },
+    {
+      "id": "t4",
+      "label": "CFO meeting",
+      "date": "Jul 28",
+      "stage": "Validation"
+    },
+    {
+      "id": "t5",
+      "label": "Security cleared",
+      "date": "Sep 02",
+      "stage": "Validation"
+    },
+    {
+      "id": "t6",
+      "label": "Pilot on 1 subsidiary",
+      "date": "Sep 22",
+      "stage": "Proof"
+    },
+    {
+      "id": "t7",
+      "label": "Legal + pricing",
+      "date": "Oct 30",
+      "stage": "Negotiation"
+    },
+    {
+      "id": "t8",
+      "label": "Signed",
+      "date": "Nov 14",
+      "stage": "Closed",
+      "win": true
+    }
+  ],
+  "steps": [
+    {
+      "id": "s1",
+      "beat": "setup",
+      "kicker": "The account",
+      "title": "A locked-in incumbent",
+      "bullets": [
+        "14,000 employees, 2,400 on paper receipts",
+        "Same vendor auto-renewed since 2019",
+        "Procurement owned the relationship"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "proc"
+        ],
+        "obstacles": [
+          "o-incumbent"
+        ],
+        "timeline": [
+          "t1"
+        ]
+      },
+      "notes": "Set the table fast. This is a displacement, not a greenfield deal."
+    },
+    {
+      "id": "s2",
+      "beat": "stakes",
+      "kicker": "The pain",
+      "title": "An audit finding, twice",
+      "bullets": [
+        "Repeat finding on expense approvals",
+        "11 days to close the books",
+        "$2.1M in unreconciled spend"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "ctrl",
+          "opsvp"
+        ],
+        "meddpicc": [
+          "identifyPain",
+          "metrics"
+        ],
+        "timeline": [
+          "t2"
+        ]
+      },
+      "notes": "The Controller gave me the number. Numbers travel; adjectives don't."
+    },
+    {
+      "id": "s3",
+      "beat": "conflict",
+      "kicker": "The stall",
+      "title": "Then it went dark",
+      "bullets": [
+        "Reorg pulled my champion off the project",
+        "Procurement re-opened the incumbent renewal",
+        "Six weeks, no meetings"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "vpfin",
+          "proc"
+        ],
+        "obstacles": [
+          "o-champion",
+          "o-incumbent"
+        ],
+        "timeline": [
+          "t3"
+        ]
+      },
+      "notes": "Own the miss out loud: I had a champion, not an economic buyer."
+    },
+    {
+      "id": "s4",
+      "beat": "turn",
+      "kicker": "The turn",
+      "title": "Found the real buyer",
+      "bullets": [
+        "CFO had committed the board to a clean audit",
+        "Traded a features pitch for a risk conversation",
+        "Funded from audit remediation, not IT budget"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "cfo",
+          "vpfin"
+        ],
+        "obstacles": [
+          "o-budget"
+        ],
+        "meddpicc": [
+          "economicBuyer"
+        ],
+        "timeline": [
+          "t4"
+        ]
+      },
+      "notes": "This is the hinge of the story. Slow down here."
+    },
+    {
+      "id": "s5",
+      "beat": "proof",
+      "kicker": "Technical hurdles",
+      "title": "Two gates, in parallel",
+      "bullets": [
+        "SOC 2 scope and SCIM cleared the CISO",
+        "NetSuite: 11 subsidiaries, custom GL dimensions",
+        "Pilot scoped to one subsidiary, three weeks"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "ciso",
+          "itdir"
+        ],
+        "obstacles": [
+          "o-security",
+          "o-erp"
+        ],
+        "timeline": [
+          "t5",
+          "t6"
+        ]
+      },
+      "notes": "Parallel, not sequential. That's where the 31 days came from."
+    },
+    {
+      "id": "s6",
+      "beat": "close",
+      "kicker": "Paper process",
+      "title": "Legal was the real gate",
+      "bullets": [
+        "Started the DPA in week 7, not week 20",
+        "Traded liability cap for a shorter cure period",
+        "CFO signed inside the quarter"
+      ],
+      "spotlight": {
+        "stakeholders": [
+          "legal",
+          "cfo"
+        ],
+        "obstacles": [
+          "o-legal"
+        ],
+        "meddpicc": [
+          "paperProcess",
+          "decisionProcess"
+        ],
+        "timeline": [
+          "t7",
+          "t8"
+        ]
+      },
+      "notes": "Most reps discover legal in week 20. Name that contrast."
+    },
+    {
+      "id": "s7",
+      "beat": "result",
+      "kicker": "The outcome",
+      "title": "$1.24M, 187 days",
+      "bullets": [
+        "31 days faster than team average",
+        "Broke a six-year renewal cycle",
+        "+$410K expansion in month seven"
+      ],
+      "spotlight": {
+        "timeline": [
+          "t8"
+        ],
+        "metrics": true
+      },
+      "notes": "Land the number, then stop talking."
+    },
+    {
+      "id": "s8",
+      "beat": "lesson",
+      "kicker": "What I'd repeat",
+      "title": "Pain travels upward",
+      "bullets": [
+        "Qualify the buyer, not the meeting",
+        "Run security and legal in parallel",
+        "A champion you haven't tested isn't one"
+      ],
+      "spotlight": {
+        "meddpicc": [
+          "champion",
+          "economicBuyer"
+        ]
+      },
+      "notes": "Close on the transferable lesson — that's what they're hiring."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "deal-map",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Interview-ready deal review visuals: MEDDPICC map, stakeholder graph, white-label branding.",
+  "bin": { "dealmap": "bin/dealmap.mjs" },
+  "scripts": {
+    "build": "node bin/dealmap.mjs build",
+    "build:all": "node bin/dealmap.mjs build-all",
+    "check": "node bin/dealmap.mjs check",
+    "list": "node bin/dealmap.mjs list",
+    "new": "node bin/dealmap.mjs new",
+    "brand": "node bin/dealmap.mjs brand"
+  },
+  "engines": { "node": ">=18" }
+}
