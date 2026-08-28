@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { validateDeal } from "../src/schema.mjs";
+import { validateDeal } from "../src/core/deal.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,8 +12,8 @@ export async function loadRules() {
   return Promise.all(files.map((f) => import(path.join(dir, f))));
 }
 
-export async function evaluate(deal, ctx = {}) {
-  const rules = await loadRules();
+export async function evaluate(deal, ctx = {}, suppliedRules) {
+  const rules = suppliedRules || await loadRules();
   const results = [];
   const structural = validateDeal(deal).map((i) => ({ level: i.level, at: i.where, msg: i.msg }));
   results.push({ id: "schema", about: "Structure the renderer requires.", findings: structural });
@@ -30,7 +30,7 @@ export async function evaluate(deal, ctx = {}) {
 }
 
 // 100 minus 8 per error, 2 per warning. Blunt on purpose: it should move when you fix things.
-function scoreOf(c) {
+export function scoreOf(c) {
   return Math.max(0, 100 - c.error * 8 - c.warn * 2);
 }
 

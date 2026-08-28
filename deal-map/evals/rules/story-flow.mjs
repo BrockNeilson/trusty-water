@@ -1,5 +1,5 @@
 // A deal review is a story: situation, complication, turn, proof, result, lesson.
-import { BEATS } from "../../src/schema.mjs";
+import { BEATS } from "../../src/core/deal.mjs";
 export const id = "story-flow";
 export const about = "The steps form an arc, not a list of facts.";
 

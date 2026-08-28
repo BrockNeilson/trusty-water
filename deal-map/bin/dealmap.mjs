@@ -12,6 +12,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P = {
   deals: path.join(root, "data", "deals"),
   brands: path.join(root, "data", "brands"),
+  logos: path.join(root, "data", "brands", "logos"),
   notes: path.join(root, "data", "notes"),
   presenter: path.join(root, "data", "presenter.json"),
   dist: path.join(root, "dist")
@@ -147,6 +148,47 @@ async function serveCmd() {
   console.log(dim("  ctrl-c to stop"));
 }
 
+// Bring an export from the hosted desk back into the repo.
+function importExport() {
+  const file = String(flag("file", "") || argv[1] || "");
+  if (!file || file === "true") fail("usage: dealmap import <deal-desk-export.json>");
+  if (!fs.existsSync(file)) fail(`No such file: ${file}`);
+  const data = JSON.parse(fs.readFileSync(file, "utf8"));
+  if (!data.deals) fail("That file has no deals in it — is it a deal desk export?");
+  const dry = !!flag("dry-run");
+  let wrote = 0;
+  for (const [slug, deal] of Object.entries(data.deals)) {
+    const dst = path.join(P.deals, `${slug}.json`);
+    const changed = !fs.existsSync(dst) || fs.readFileSync(dst, "utf8") !== JSON.stringify(deal, null, 2) + "\n";
+    console.log(`  ${changed ? bold("deal   ") : dim("deal   ")} ${slug}${changed ? "" : dim(" (unchanged)")}`);
+    if (changed && !dry) { fs.writeFileSync(dst, JSON.stringify(deal, null, 2) + "\n"); wrote++; }
+  }
+  for (const [slug, text] of Object.entries(data.notes || {})) {
+    fs.mkdirSync(P.notes, { recursive: true });
+    const dst = path.join(P.notes, `${slug}.md`);
+    const changed = !fs.existsSync(dst) || fs.readFileSync(dst, "utf8") !== text;
+    console.log(`  ${changed ? bold("notes  ") : dim("notes  ")} ${slug}${changed ? "" : dim(" (unchanged)")}`);
+    if (changed && !dry) { fs.writeFileSync(dst, text); wrote++; }
+  }
+  for (const [id, brand] of Object.entries(data.brands || {})) {
+    const b = { ...brand };
+    if (b.logoData) {
+      const m = /^data:image\/(png|jpeg|svg\+xml|webp);base64,(.+)$/.exec(b.logoData);
+      if (m && !dry) {
+        const ext = { png: ".png", jpeg: ".jpg", "svg+xml": ".svg", webp: ".webp" }[m[1]];
+        fs.mkdirSync(P.logos, { recursive: true });
+        fs.writeFileSync(path.join(P.logos, `${id}${ext}`), Buffer.from(m[2], "base64"));
+        b.logo = `logos/${id}${ext}`;
+      }
+      delete b.logoData;
+    }
+    console.log(`  ${bold("audience")} ${id}`);
+    if (!dry) { fs.writeFileSync(path.join(P.brands, `${id}.json`), JSON.stringify(b, null, 2) + "\n"); wrote++; }
+  }
+  if (data.presenter && !dry) fs.writeFileSync(P.presenter, JSON.stringify(data.presenter, null, 2) + "\n");
+  console.log(dry ? dim("\ndry run — nothing written") : `\n${bold(String(wrote))} files written. Review with git diff before committing.`);
+}
+
 function list() {
   const notes = fs.existsSync(P.notes)
     ? fs.readdirSync(P.notes).filter((f) => f.endsWith(".md") && !f.startsWith("_"))
@@ -182,12 +224,24 @@ const help = `${bold("dealmap")} — deal-review visuals for interviews
   ${bold("intake")}  <slug> [--company "Name"]                  start a raw notes file — this is where a story goes in
   ${bold("new")}     --deal <slug>                             scaffold a deal file plus its notes file
   ${bold("brand")}   <id> [--company X] [--accent #HEX]        scaffold a white-label target
-  ${bold("serve")}   [--port 4173]                             open the deal desk — the dashboard over all deals
+  ${bold("serve")}   [--port 4173]                             open the deal desk locally
+  ${bold("hosted")}  [--out file]                              build the hosted desk (persists by republishing itself)
+  ${bold("import")}  <export.json> [--dry-run]                 pull a hosted-desk export back into data/
   ${bold("list")}                                              show deals and brands
 
 ${dim("Keys in the deck: ← → step · N presenter notes · O overview · F fullscreen · 1-9 jump")}`;
 
-const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand, list, serve: serveCmd };
+async function hosted() {
+  const { buildHosted } = await import("./build-hosted.mjs");
+  const { page } = buildHosted();
+  const out = typeof flag("out") === "string" ? String(flag("out")) : path.join(P.dist, "deal-desk.html");
+  fs.mkdirSync(path.dirname(out), { recursive: true });
+  fs.writeFileSync(out, page);
+  console.log(`${bold("built")} ${path.relative(process.cwd(), out)} ${dim(`(${(Buffer.byteLength(page) / 1024).toFixed(0)} KB)`)}`);
+}
+
+const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand,
+              list, serve: serveCmd, hosted, import: importExport };
 try {
   if (!cmd || cmd === "help" || cmd === "--help") console.log(help);
   else if (run[cmd]) await run[cmd]();

@@ -1,0 +1,20 @@
+/* Hosted-desk additions on top of the shared desk styles. */
+.dirty-dot{width:7px;height:7px;border-radius:50%;background:var(--brass);flex:none}
+.ro-banner,.draft-bar{display:flex;align-items:center;gap:12px;padding:10px 26px;font-size:12.5px;
+  border-bottom:1px solid var(--edge-soft)}
+.ro-banner{background:color-mix(in srgb,var(--brass) 12%,var(--ground));color:var(--ink)}
+.draft-bar{background:var(--panel-2);color:var(--muted)}
+.draft-bar b{color:var(--ink)}
+[hidden]{display:none!important}
+.present{position:fixed;inset:0;z-index:90;background:#000;display:none}
+.present.on{display:block}
+.present iframe{width:100%;height:100%;border:0;display:block}
+.present-close{position:absolute;top:14px;right:16px;z-index:2}
+textarea[disabled],input[disabled],select[disabled]{opacity:.7;cursor:not-allowed}
+@media (max-width:1000px){
+  .top{flex-wrap:wrap;gap:10px}
+  .preview{display:none}          /* on a phone the preview is Present, not a pane */
+  .deal.on{grid-template-columns:minmax(0,1fr)}
+  .pane{border-right:0}
+  textarea.notes,textarea.json{min-height:52vh}
+}

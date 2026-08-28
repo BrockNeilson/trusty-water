@@ -5,7 +5,7 @@ import http from "node:http";
 import { fileURLToPath } from "node:url";
 import { loadDeal, loadBrand, validateDeal, normalize } from "./schema.mjs";
 import { render } from "./render.mjs";
-import { auditBrand, contrast } from "./theme.mjs";
+import { auditBrand, contrast } from "./core/theme.mjs";
 import { evaluate } from "../evals/run.mjs";
 import { dashboardPage } from "./dashboard.mjs";
 

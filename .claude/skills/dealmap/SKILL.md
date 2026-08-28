@@ -8,9 +8,15 @@ description: Build, review and white-label the interview deal-map deck in deal-m
 The project lives in `deal-map/`. One deal file plus one brand file renders one self-contained
 HTML deck. Read `deal-map/README.md` first if you have not this session.
 
-## The desk
+## Two desks
 
-`node bin/dealmap.mjs serve` opens the dashboard over all deals (default port 4173) — cards per
+`node bin/dealmap.mjs hosted` builds the **hosted desk** — one page carrying the data, the
+renderer and the evals, published as an Artifact with `capabilities: {artifact: {}, downloads: true}`.
+It persists by republishing itself, so saving is explicit and last-write-wins. Rebuilding and
+republishing it from here **overwrites whatever the user saved live** — always ask first, and
+prefer `dealmap import` to pull their live state down before rebuilding.
+
+`node bin/dealmap.mjs serve` opens the local dashboard over all deals (default port 4173) — cards per
 deal, and per deal: Notes, Story, Audience and Checks tabs beside a live preview. It writes
 files under `data/`, so anything done there is a normal commit.
 

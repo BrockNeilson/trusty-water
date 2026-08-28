@@ -1,5 +1,5 @@
 // The things that make it look thoughtful rather than improvised.
-import { auditBrand, contrast } from "../../src/theme.mjs";
+import { auditBrand, contrast } from "../../src/core/theme.mjs";
 export const id = "presentability";
 export const about = "Brand lockup and stage-readiness checks.";
 

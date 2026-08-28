@@ -19,7 +19,7 @@ data/presenter.json        you
 dist/<slug>-<id>.html      one self-contained file. No server, no network, no runtime build.
 ```
 
-## The desk
+## The local desk
 
 One layer above a deal is the desk: every deal as a card, click into one to write it, brand it,
 check it and send it. The preview renders at 1280×720 — the size a shared screen actually is.
@@ -91,6 +91,39 @@ full map, spotlight intact.
 
 It is one HTML file. Email it, put it on a USB stick, open it on their laptop. It renders
 offline; the web font is the only network call and it falls back cleanly.
+
+## The hosted desk
+
+`node bin/dealmap.mjs hosted` builds a single page that is the whole desk — the deals, the
+renderer, the evals and the editor — which is then published as an Artifact and opened from
+anywhere, phone included.
+
+**How it persists.** There is no database. The page carries your data inside itself and a
+base64 copy of its own template; pressing **Save** regenerates the document with the new data
+and republishes it. That has three consequences worth knowing before you rely on it:
+
+- **Saving is explicit.** Every save republishes and reloads every open view, so it would be
+  hostile to do it on every keystroke. Edits are held locally (and mirrored to this device's
+  storage, so a reload offers to restore them) until you press Save.
+- **Last write wins.** If two views save against the same version, the second is refused and
+  that view reloads to the winner. For one person on two devices this is rare; it is not a
+  collaborative editor.
+- **Anyone you share the page with sees every deal on it.** Share a *deck* for feedback, not
+  the desk.
+
+People without write access get a read-only desk: they can read the deals and comment, but
+Save is hidden and every field is disabled.
+
+**Getting the data back into the repo.** Share → *Export all data* writes a JSON file with the
+same shape as `data/`, and `node bin/dealmap.mjs import <file>` writes it back:
+
+```bash
+node bin/dealmap.mjs import ~/Downloads/deal-desk-export.json --dry-run   # see what would change
+node bin/dealmap.mjs import ~/Downloads/deal-desk-export.json             # then git diff
+```
+
+The repo stays the archive; the hosted desk is where you work when you are not at your machine.
+They do not sync on their own — export and import are the bridge.
 
 ## How a story becomes the deck
 

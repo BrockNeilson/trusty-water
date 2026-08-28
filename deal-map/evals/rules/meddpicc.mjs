@@ -1,5 +1,5 @@
 // MEDDPICC is the credibility layer. Gaps here are what an interviewer probes.
-import { MEDDPICC } from "../../src/schema.mjs";
+import { MEDDPICC } from "../../src/core/deal.mjs";
 export const id = "meddpicc";
 export const about = "Every letter is filled, scored, and evidenced.";
 
