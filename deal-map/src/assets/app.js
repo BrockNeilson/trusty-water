@@ -8,9 +8,11 @@
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
 
   var elNarr = $("#narrative"), elMap = $("#map"), elInner = $("#map-inner"),
-      elSteps = $("#steps"), elCount = $("#counter"), elMetrics = $("#metrics"),
-      elOv = $("#overview"), elBeat = $("#beatmap"), wires = $("#wires");
-  var fit = 1;
+      elScroll = $("#map-scroll"), elSteps = $("#steps"), elCount = $("#counter"),
+      elMetrics = $("#metrics"), elOv = $("#overview"), elBeat = $("#beatmap"), wires = $("#wires");
+  var fit = 1;            // 1 unless Z has pulled back to show the whole map
+  var zoomedOut = false;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   /* ---------- narrative ---------- */
   function paintNarrative() {
@@ -44,42 +46,91 @@
   function paintSpotlight() {
     var sp = applySpotlight(steps[i]);
     if (elMetrics) elMetrics.classList.toggle("show", !!sp.metrics);
+    scrollToSpotlight();
     drawWires();
   }
-  function mark(sel) { var e = $(sel, elInner); if (e) e.classList.add("hot"); }
 
-  /* ---------- fit to screen ----------
-     Scale is derived from the tallest step, so the map never resizes mid-story
-     and never spills off a smaller laptop screen. */
-  function fitMap() {
-    if (!elInner) return;
-    elInner.style.transition = "none";
-    elInner.style.transform = "";
-    elInner.style.width = "";
-    elInner.style.height = "";
-    fit = 1;
-    if (window.innerWidth < 900) { elInner.style.transition = ""; return; }
+  /* Bring what this step lit up into view. The audience cannot scroll — only the
+     presenter — so every step has to land on its own content. When a step lights
+     elements across more zones than fit on one screen, centre its primary zone:
+     spotlight.focus if the deal names one, otherwise whichever zone it lit most. */
+  var ZONES = [[".node", "stakeholders"], [".gate", "obstacles"], [".tick", "timeline"], [".md", "meddpicc"]];
 
-    elMap.classList.add("measuring");   // kills transitions so heights are exact
-    var natural = 0;
-    for (var n = 0; n < steps.length; n++) {
-      applySpotlight(steps[n]);
-      natural = Math.max(natural, elInner.scrollHeight);
-    }
-    applySpotlight(steps[i]);
-    elMap.classList.remove("measuring");
-
-    var avail = elMap.clientHeight - 2;
-    if (natural > avail && natural > 0) {
-      fit = Math.max(0.7, avail / natural);
-      var pct = (100 / fit).toFixed(3) + "%";
-      elInner.style.width = pct;
-      elInner.style.height = pct;
-      elInner.style.transform = "scale(" + fit.toFixed(4) + ")";
-    }
-    void elInner.offsetWidth;
-    elInner.style.transition = "";
+  function boxOf(list, base) {
+    var t = Infinity, b = -Infinity;
+    list.forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      t = Math.min(t, r.top - base);
+      b = Math.max(b, r.bottom - base);
+    });
+    return { t: t, b: b, h: b - t };
   }
+
+  function scrollToSpotlight() {
+    if (!elScroll || zoomedOut) return;
+    var hot = $$(".hot", elInner);
+    if (!hot.length) { setScroll(0); return; }
+    var view = elScroll.clientHeight;
+    var base = elInner.getBoundingClientRect().top;
+    var pick = boxOf(hot, base);
+
+    if (pick.h > view) {
+      var sp = steps[i].spotlight || {};
+      var groups = {};
+      ZONES.forEach(function (z) {
+        groups[z[1]] = hot.filter(function (el) { return el.matches(z[0]); });
+      });
+      var chosen = sp.focus && groups[sp.focus] && groups[sp.focus].length ? groups[sp.focus] : null;
+      if (!chosen) {
+        ZONES.forEach(function (z) {
+          var g = groups[z[1]];
+          if (g.length && (!chosen || g.length > chosen.length)) chosen = g;
+        });
+      }
+      if (chosen && chosen.length) pick = boxOf(chosen, base);
+    }
+
+    // A tall block lands under the top edge so it reads as one unit; a short one centres.
+    var target = pick.h > view * 0.55
+      ? pick.t - 46
+      : (pick.t + pick.b) / 2 - view / 2;
+    setScroll(Math.max(0, Math.min(target, elScroll.scrollHeight - view)));
+  }
+
+  function setScroll(top) {
+    // "auto" defers to the CSS scroll-behavior (smooth) — "instant" is the jump.
+    if (elScroll.scrollTo) elScroll.scrollTo({ top: top, behavior: reduced ? "instant" : "smooth" });
+    else elScroll.scrollTop = top;
+  }
+
+  function edges() {
+    if (!elScroll) return;
+    var t = $("#edge-top"), b = $("#edge-bottom");
+    var more = elScroll.scrollHeight - elScroll.clientHeight;
+    if (t) t.classList.toggle("on", !zoomedOut && elScroll.scrollTop > 6);
+    if (b) b.classList.toggle("on", !zoomedOut && more > 6 && elScroll.scrollTop < more - 6);
+  }
+
+  /* Z: pull back so the whole map is visible for a beat, then return to reading size. */
+  function toggleZoomOut(v) {
+    zoomedOut = v === undefined ? !zoomedOut : v;
+    elMap.classList.toggle("zoomed-out", zoomedOut);
+    if (zoomedOut) {
+      elScroll.scrollTop = 0;
+      var natural = elInner.scrollHeight;
+      var avail = elScroll.clientHeight - 12;
+      fit = natural > avail && natural > 0 ? avail / natural : 1;
+      elInner.style.width = (100 / fit).toFixed(3) + "%";
+      elInner.style.transform = "scale(" + fit.toFixed(4) + ")";
+    } else {
+      fit = 1;
+      elInner.style.width = "";
+      elInner.style.transform = "";
+      scrollToSpotlight();
+    }
+    setTimeout(function () { drawWires(); edges(); }, reduced ? 0 : 380);
+  }
+  function mark(sel) { var e = $(sel, elInner); if (e) e.classList.add("hot"); }
 
   /* ---------- wires ---------- */
   function drawWires() {
@@ -160,7 +211,9 @@
     else if (k === "ArrowLeft" || k === "PageUp" || k === "k") { e.preventDefault(); go(i - 1); }
     else if (k === "Home") go(0);
     else if (k === "End") go(steps.length - 1);
-    else if (k === "o" || k === "Escape") toggleOverview(k === "Escape" ? false : undefined);
+    else if (k === "o") toggleOverview();
+    else if (k === "z") toggleZoomOut();
+    else if (k === "Escape") { toggleOverview(false); if (zoomedOut) toggleZoomOut(false); }
     else if (k === "n") { notesOn = !notesOn; var nt = $("#notes"); if (nt) nt.hidden = !notesOn; }
     else if (k === "f") { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
     else if (/^[1-9]$/.test(k)) go(+k - 1);
@@ -181,10 +234,17 @@
   }, { passive: true });
 
   var rt;
-  function relayout() { clearTimeout(rt); rt = setTimeout(function () { fitMap(); drawWires(); }, 90); }
+  function relayout() {
+    clearTimeout(rt);
+    rt = setTimeout(function () {
+      if (zoomedOut) toggleZoomOut(true); else scrollToSpotlight();
+      drawWires(); edges();
+    }, 90);
+  }
   window.addEventListener("resize", relayout);
   // The deck is often rendered inside a preview frame that resizes after load.
   if (window.ResizeObserver && elMap) new ResizeObserver(relayout).observe(elMap);
+  if (elScroll) elScroll.addEventListener("scroll", function () { edges(); drawWires(); }, { passive: true });
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -193,12 +253,10 @@
   }
 
   buildOverview();
-  fitMap();
   var start = parseInt((location.hash || "").slice(1), 10);
   go(isFinite(start) && start > 0 ? start - 1 : 0);
-  window.addEventListener("load", function () { fitMap(); drawWires(); });
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () { fitMap(); drawWires(); });
-  }
-  setTimeout(function () { fitMap(); drawWires(); }, 400);
+  var settle = function () { scrollToSpotlight(); drawWires(); edges(); };
+  window.addEventListener("load", settle);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(settle);
+  setTimeout(settle, 400);
 })();

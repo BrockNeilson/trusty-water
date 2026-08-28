@@ -22,12 +22,17 @@ for n in $(seq 1 8); do
 done
 ```
 
-Then Read each PNG. Check at 1440×900 **and** 1280×800 — the second is the laptop they will
-actually hand you in the room.
+Then Read each PNG. **Shoot at 1280×720** — that is the compressed screen share the deck is
+designed for, and the size where legibility problems show up first. Check 1440×900 as well.
 
 ## What to look for
 
-- **Overflow and clipping.** Any card cut off at the bottom edge is a bug in the fit pass.
+- **Legibility first.** Nothing an audience reads should be under 12px on a 1280×720 frame. If
+  it is, the fix is less content or a tighter focus — never a smaller scale.
+- **Overflow and clipping.** A card cut at the right edge means a grid track sized to its content
+  (`1fr` is `minmax(auto,1fr)`); the fix is `minmax(0,1fr)` and `min-width:0`, not a smaller font.
+- **The scroll landing.** Each step scrolls the map to its zone: does the step land on its own
+  content, with the zone label in frame and no half-sliced card above it?
 - **Dead space.** Large empty regions read as unfinished, not minimal.
 - **The spotlight.** On each step: is the eye pulled to the right two or three cards? If more
   than five things are lit, nothing is.

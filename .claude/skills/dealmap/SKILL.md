@@ -57,6 +57,11 @@ Chrome and Read the images (the `deck-critic` agent does this end to end).
   Clear it only when the content is genuinely the user's.
 - Titles ≤ 6 words, ≤ 3 bullets per step, ≤ 10 words per bullet. The evals enforce this; do not
   argue with it, cut the words.
+- **The deck targets a 1280×720 shared screen.** The map is rendered at reading size and scrolls;
+  each step scrolls to its zone. Never reintroduce a shrink-to-fit pass — that is what produced
+  7px text. If something does not fit, cut content or set `spotlight.focus`, do not scale down.
+- A step that lights three or more zones needs `spotlight.focus` naming where the map should
+  land. The `coverage` eval will tell you.
 - Never invent a metric, a name, or an outcome. If a number is missing, ask for it.
 - The client logo goes *beside* the presenter's name under "Prepared for", never above it.
 - Keys during the walkthrough: `←/→` step · `N` notes · `O` overview · `F` fullscreen · `1-9` jump.

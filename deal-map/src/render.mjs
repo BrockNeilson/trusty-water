@@ -142,7 +142,7 @@ function footer(d) {
     <div class="steps" id="steps">${d.steps.map((s, n) =>
       `<button class="stepbtn" data-n="${n}">${esc(s.kicker || s.beat || s.title)}</button>`).join("")}</div>
     <div class="counter" id="counter"></div>
-    <div class="keys"><kbd>←</kbd><kbd>→</kbd> step <kbd>N</kbd> notes <kbd>O</kbd> map <kbd>F</kbd> full</div>
+    <div class="keys"><kbd>←</kbd><kbd>→</kbd> step <kbd>Z</kbd> whole map <kbd>N</kbd> notes <kbd>O</kbd> steps <kbd>F</kbd> full</div>
   </footer>`;
 }
 
@@ -166,6 +166,9 @@ ${asset("styles.css")}
   <div class="body">
     <section class="narrative anim-in" id="narrative">${narrative(d.steps[0] || { title: "" })}</section>
     <section class="map" id="map">
+      <div class="edge top" id="edge-top"></div>
+      <div class="edge bottom" id="edge-bottom"></div>
+      <div class="map-scroll" id="map-scroll">
       <div class="map-inner" id="map-inner">
         <svg id="wires" preserveAspectRatio="none"></svg>
         ${dealbar(d)}
@@ -173,6 +176,7 @@ ${asset("styles.css")}
         ${gates(d)}
         ${rail(d)}
         ${medd(d)}
+      </div>
       </div>
       ${metricsOverlay(d)}
     </section>

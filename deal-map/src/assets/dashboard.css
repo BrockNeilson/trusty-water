@@ -134,7 +134,7 @@ textarea.json{min-height:calc(100vh - 300px);font-family:var(--mono);font-size:1
    see is the layout an interviewer gets — not a narrow-window fallback. */
 .frame-stage{position:absolute;top:16px;left:16px;transform-origin:top left}
 iframe{border:1px solid var(--edge);border-radius:var(--r-lg);background:#000;display:block;
-  width:1440px;height:900px}
+  width:1280px;height:720px}
 .frame-size{font-size:11px;color:var(--faint);font-variant-numeric:tabular-nums}
 
 /* ---------- modal ---------- */

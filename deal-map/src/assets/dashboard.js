@@ -204,7 +204,8 @@
     }).catch(function (e) { $("#panel-body").innerHTML = '<div class="empty">' + esc(e.message) + "</div>"; });
   }
 
-  var FRAME_W = 1440, FRAME_H = 900;
+  // The size a shared screen actually is — the deck is designed against this.
+  var FRAME_W = 1280, FRAME_H = 720;
 
   function fitFrame() {
     var wrap = $("#frame-wrap"), stage = $("#frame-stage");

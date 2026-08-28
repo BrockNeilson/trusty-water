@@ -7,6 +7,7 @@ export const ROLES = [
   "user_buyer", "blocker", "influencer"
 ];
 export const BEATS = ["setup", "stakes", "conflict", "turn", "proof", "close", "result", "lesson"];
+export const ZONES = ["stakeholders", "obstacles", "timeline", "meddpicc"];
 export const OBSTACLE_TYPES = ["technical", "political", "legal", "commercial", "competitive", "timing"];
 
 export const MEDDPICC = [
@@ -135,6 +136,9 @@ export function validateDeal(d) {
     (sp.meddpicc || []).forEach((k) => {
       if (!MEDDPICC.some(([key]) => key === k)) err(`spotlight -> unknown meddpicc key "${k}"`, at);
     });
+    if (sp.focus && !ZONES.includes(sp.focus)) {
+      err(`spotlight.focus "${sp.focus}" must be one of ${ZONES.join(", ")}`, at);
+    }
   });
   return issues;
 }

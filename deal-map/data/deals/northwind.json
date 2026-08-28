@@ -294,7 +294,8 @@
         ],
         "timeline": [
           "t1"
-        ]
+        ],
+        "focus": "stakeholders"
       },
       "notes": "Set the table fast. This is a displacement, not a greenfield deal."
     },
@@ -319,7 +320,8 @@
         ],
         "timeline": [
           "t2"
-        ]
+        ],
+        "focus": "meddpicc"
       },
       "notes": "The Controller gave me the number. Numbers travel; adjectives don't."
     },
@@ -344,7 +346,8 @@
         ],
         "timeline": [
           "t3"
-        ]
+        ],
+        "focus": "obstacles"
       },
       "notes": "Own the miss out loud: I had a champion, not an economic buyer."
     },
@@ -371,7 +374,8 @@
         ],
         "timeline": [
           "t4"
-        ]
+        ],
+        "focus": "stakeholders"
       },
       "notes": "This is the hinge of the story. Slow down here."
     },
@@ -397,7 +401,8 @@
         "timeline": [
           "t5",
           "t6"
-        ]
+        ],
+        "focus": "obstacles"
       },
       "notes": "Parallel, not sequential. That's where the 31 days came from."
     },
@@ -426,7 +431,8 @@
         "timeline": [
           "t7",
           "t8"
-        ]
+        ],
+        "focus": "meddpicc"
       },
       "notes": "Most reps discover legal in week 20. Name that contrast."
     },

@@ -35,6 +35,12 @@ export function run(d) {
       .reduce((a, k) => a + (Array.isArray(sp[k]) ? sp[k].length : 0), 0);
     if (all === 0 && !sp.metrics) f.push({ level: "warn", at: `step ${s.id}`, msg: "spotlights nothing — the map goes static while you talk" });
     if (cards > 5) f.push({ level: "warn", at: `step ${s.id}`, msg: `spotlights ${cards} cards — the eye can hold about five` });
+    // The map scrolls, so a step spanning several zones cannot show them all at once.
+    const zones = ["stakeholders", "obstacles", "timeline", "meddpicc"].filter((z) => (sp[z] || []).length);
+    if (zones.length > 2 && !sp.focus) {
+      f.push({ level: "warn", at: `step ${s.id}`,
+        msg: `lights ${zones.length} zones (${zones.join(", ")}) — set spotlight.focus to say which one the map should land on` });
+    }
   }
   return f;
 }

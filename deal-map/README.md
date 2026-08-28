@@ -22,7 +22,7 @@ dist/<slug>-<id>.html      one self-contained file. No server, no network, no ru
 ## The desk
 
 One layer above a deal is the desk: every deal as a card, click into one to write it, brand it,
-check it and send it.
+check it and send it. The preview renders at 1280×720 — the size a shared screen actually is.
 
 ```bash
 cd deal-map
@@ -67,9 +67,27 @@ Keys while presenting:
 |---|---|
 | `←` `→` `space` | step |
 | `1`–`9` | jump to a step |
+| `Z` | pull back to the whole map for a beat, then press again to return |
 | `N` | your presenter note for this step |
 | `O` | overview — every step as a card, click to jump |
 | `F` | fullscreen |
+
+### Why the map scrolls
+
+The deck is sized for a **1280×720 shared screen** — the compressed Zoom or Meet share, which is
+the realistic worst case. At that size nothing on the map is smaller than 12px, and the things
+you actually read aloud are 14-17px.
+
+That does not fit on one screen, and it should not: an earlier version scaled the whole map down
+to fit and produced 7px text, which no one on a screen share could read. So the map is rendered
+at full size and **scrolls**, and each step scrolls it to the part of the map that step is about.
+Your audience never scrolls — the deck does it for them.
+
+When a step lights up more than one zone, `spotlight.focus` says which one the map should land
+on (`stakeholders`, `obstacles`, `timeline` or `meddpicc`). The `coverage` eval warns when a step
+spans three or more zones without naming a focus, because that is a step the map cannot land
+cleanly on. Press `Z` any time you want to say "here is the whole deal" — it pulls back to the
+full map, spotlight intact.
 
 It is one HTML file. Email it, put it on a USB stick, open it on their laptop. It renders
 offline; the web font is the only network call and it falls back cleanly.
@@ -134,7 +152,8 @@ The coach writes this file for you, but it is plain JSON and you should know wha
 - **`meta.brand`** — which audience this deal is prepared for (set by the desk's picker).
 - **`timeline`** — the deal path. `flag: true` marks the stall, `win: true` marks the close.
 - **`steps`** — the story. Each step has a `beat`, a title, up to three bullets, a `spotlight`
-  naming the ids to light up, and `notes` (yours only, behind `N`).
+  naming the ids to light up, and `notes` (yours only, behind `N`). `spotlight.focus` names the
+  zone the map should scroll to when the step lights more than one.
 
 Set `"draft": false` when the content is genuinely yours.
 
@@ -187,7 +206,7 @@ Four agents in `.claude/agents/`, plus a `/dealmap` skill that ties them togethe
 
 ## Notes on design
 
-- The map scales to fit whatever screen it lands on. The scale is measured from the *tallest*
-  step, so nothing resizes mid-story and nothing spills off a small laptop.
+- The map is rendered at reading size and scrolled, never shrunk to fit. Legibility on a shared
+  screen beats seeing every element at once — `Z` covers the moments you want the whole picture.
 - Everything is one file: styles, script and logo are inlined at build time.
 - Dark ground, one accent. The accent is the only colour that moves, so the eye follows it.
