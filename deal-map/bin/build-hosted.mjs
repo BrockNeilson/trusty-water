@@ -63,7 +63,7 @@ export function buildHosted() {
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
-<style>${read("src/assets/dashboard.css")}\n${read("src/assets/desk.css")}</style>
+<style>${read("src/assets/desk.css")}</style>
 </head>
 <body>
 ${read("src/assets/desk.html")}
@@ -77,7 +77,12 @@ window.__NOTES_TEMPLATE__ = ${safe(notesTemplate)};
 </script>
 <script>
 ${safe(engine)}
-${safe(read("src/assets/desk.js"))}
+</script>
+<script>
+${safe(read("src/assets/store-page.js"))}
+</script>
+<script>
+${safe(read("src/assets/desk-ui.js"))}
 </script>
 </body>
 </html>`;
