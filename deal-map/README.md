@@ -8,11 +8,13 @@ talking about and dims the rest, so the audience always knows where they are in 
 have never seen. You talk; you do not read.
 
 ```
-data/deals/<slug>.json   the story and the map
-data/brands/<id>.json    who it is prepared for
-data/presenter.json      you
-        ↓
-dist/<slug>-<id>.html    one self-contained file. No server, no network, no build step at runtime.
+data/notes/<slug>.md     ← you write here. Prose, fragments, a pasted transcript.
+        ↓                  deal-story-coach reads it and writes:
+data/deals/<slug>.json     the structured deal — people, obstacles, MEDDPICC, and the steps
+data/brands/<id>.json      who it is prepared for
+data/presenter.json        you
+        ↓                  node bin/dealmap.mjs build
+dist/<slug>-<id>.html      one self-contained file. No server, no network, no runtime build.
 ```
 
 ## Use it
@@ -38,6 +40,44 @@ Keys while presenting:
 It is one HTML file. Email it, put it on a USB stick, open it on their laptop. It renders
 offline; the web font is the only network call and it falls back cleanly.
 
+## How a story becomes the deck
+
+The input is prose. You do not write JSON.
+
+```bash
+node bin/dealmap.mjs intake acme --company "Acme Freight"   # creates data/notes/acme.md
+```
+
+That file is an interview with yourself: the account, the pain and its number, every person who
+mattered and what *they* were measured on, where it went wrong, the turn, the hurdles, the close,
+the outcome, the lesson. Write badly in it. Paste a CRM export or a transcript of you talking it
+through out loud. Leave blanks — a blank is information, it shows where the story is thin.
+
+Then hand it over:
+
+> "Turn my acme notes into a deal"
+
+The `deal-story-coach` agent reads `data/notes/acme.md` and writes `data/deals/acme.json`. It
+asks you about anything material that is missing rather than inventing it — **every number in the
+deck traces back to a line in your notes.** Then it runs the evals and tightens the copy until
+they pass.
+
+`data/notes/northwind.md` is the worked example: the notes the sample deal was generated from, so
+you can see the whole translation.
+
+### What the translation actually does
+
+| your notes | becomes | why |
+|---|---|---|
+| the people and who they answered to | `stakeholders`, with roles, sentiment, influence, reporting lines | the map — the lanes and the connectors |
+| "it stalled in July, procurement re-opened the renewal" | `obstacles` + a flagged point on the `timeline` | the gates you cleared, and the dip in the deal path |
+| the numbers, and who gave them to you | `meddpicc` scores and proof lines, `metrics` tiles | what survives an interviewer's follow-up |
+| the shape of what happened | `steps` — eight beats, ≤ 6-word titles, ≤ 3 bullets | what you actually say out loud |
+| the parts you'd say but not put on screen | `notes` on each step, behind the `N` key | your prompt, not the audience's reading material |
+
+The bullets are not the story — they are the prompts for it. Everything you would say in full
+sentences belongs in `notes`, where only you see it.
+
 ## Make it yours
 
 The shipped `northwind` deal is a **sample**. It is marked `"draft": true`, which puts a
@@ -45,10 +85,10 @@ SAMPLE DATA badge in the header and fails the eval suite on purpose, so you cann
 accident.
 
 ```bash
-node bin/dealmap.mjs new --deal acme     # copies the sample as a starting shape
+node bin/dealmap.mjs new --deal acme     # a deal file plus its notes file
 ```
 
-Then edit `data/deals/acme.json`:
+The coach writes this file for you, but it is plain JSON and you should know what is in it:
 
 - **`meta`** — deal name, ACV, cycle length, outcome, and `targetMinutes` (how long you get).
 - **`stakeholders`** — `role` is one of `economic_buyer`, `champion`, `coach`, `technical_buyer`,

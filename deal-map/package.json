@@ -10,6 +10,7 @@
     "build:all": "node bin/dealmap.mjs build-all",
     "check": "node bin/dealmap.mjs check",
     "list": "node bin/dealmap.mjs list",
+    "intake": "node bin/dealmap.mjs intake",
     "new": "node bin/dealmap.mjs new",
     "brand": "node bin/dealmap.mjs brand"
   },

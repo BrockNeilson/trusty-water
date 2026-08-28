@@ -8,6 +8,16 @@ description: Build, review and white-label the interview deal-map deck in deal-m
 The project lives in `deal-map/`. One deal file plus one brand file renders one self-contained
 HTML deck. Read `deal-map/README.md` first if you have not this session.
 
+## Where input comes from
+
+Stories go in as prose at `deal-map/data/notes/<slug>.md`, never as hand-written JSON.
+`node bin/dealmap.mjs intake <slug>` starts one from the template. The `deal-story-coach` agent
+reads that file and generates `data/deals/<slug>.json` from it.
+
+If the user tells you the story in chat instead, **write it into the notes file first**, then
+generate the deal from it. The notes file is the source of truth for where every number came
+from; a deal file with no notes behind it cannot be checked against anything later.
+
 ## The loop
 
 Every change goes through the same three steps. Do not skip the check.
@@ -26,7 +36,8 @@ Chrome and Read the images (the `deck-critic` agent does this end to end).
 | The user says | Do this |
 |---|---|
 | "I'm interviewing with X on Thursday" | `node bin/dealmap.mjs brand x --company "X" --accent '#HEX'`, check contrast, build |
-| "Here are my notes on the Acme deal" | Hand it to `deal-story-coach`, then run the loop |
+| "Here are my notes on the Acme deal" | Save them to `data/notes/acme.md`, hand to `deal-story-coach`, run the loop |
+| "I want to add a deal" | `node bin/dealmap.mjs intake <slug>`, then walk them through the notes file |
 | "Does this hold up?" | `meddpicc-auditor` — it returns the questions they will actually ask |
 | "It looks off / cramped / too dark" | `deck-critic` — it screenshots before it opines |
 | "Make it shorter" | `check` reports estimated spoken minutes; cut bullets, not steps |

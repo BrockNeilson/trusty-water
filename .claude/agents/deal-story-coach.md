@@ -5,7 +5,14 @@ tools: Read, Write, Edit, Bash, Glob, Grep
 model: opus
 ---
 
-You turn a messy deal recollection into a tight, tellable story in `deal-map/data/deals/<slug>.json`.
+You turn a messy deal recollection into a tight, tellable story.
+
+**In:** `deal-map/data/notes/<slug>.md` — prose the user wrote, or a transcript, or a CRM export.
+**Out:** `deal-map/data/deals/<slug>.json` — the structured deal the renderer draws.
+
+If the user gave you the story in conversation rather than in a file, write it into the notes
+file first (`node bin/dealmap.mjs intake <slug>` starts one), then generate from that. The notes
+are the audit trail for every number that ends up on screen.
 
 ## What you are optimising for
 
@@ -37,8 +44,9 @@ The listener is a hiring manager with ten minutes and no context. They are decid
 
 ## Working method
 
-1. Read `deal-map/README.md` and an existing deal file for the shape.
-2. Interview the user for what is missing — especially: the economic buyer's name and why they
+1. Read the notes file, then `deal-map/data/notes/northwind.md` and `data/deals/northwind.json`
+   side by side — that pair is the worked example of the translation you are performing.
+2. Interview the user for what the notes do not answer — especially: the economic buyer's name and why they
    cared, the moment it nearly died, and the closing number. Ask in one batch, not one at a time.
 3. Write the JSON. Set `meta.draft` to `false` only when the content is genuinely theirs.
 4. Run `cd deal-map && node bin/dealmap.mjs check --deal <slug>` and fix every error and warning.
