@@ -6,6 +6,7 @@
   "description": "Interview-ready deal review visuals: MEDDPICC map, stakeholder graph, white-label branding.",
   "bin": { "dealmap": "bin/dealmap.mjs" },
   "scripts": {
+    "serve": "node bin/dealmap.mjs serve",
     "build": "node bin/dealmap.mjs build",
     "build:all": "node bin/dealmap.mjs build-all",
     "check": "node bin/dealmap.mjs check",

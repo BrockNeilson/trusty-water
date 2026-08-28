@@ -8,6 +8,15 @@ description: Build, review and white-label the interview deal-map deck in deal-m
 The project lives in `deal-map/`. One deal file plus one brand file renders one self-contained
 HTML deck. Read `deal-map/README.md` first if you have not this session.
 
+## The desk
+
+`node bin/dealmap.mjs serve` opens the dashboard over all deals (default port 4173) — cards per
+deal, and per deal: Notes, Story, Audience and Checks tabs beside a live preview. It writes
+files under `data/`, so anything done there is a normal commit.
+
+Use it when the user wants to *see* their deals, create one, change who it is prepared for, drop
+in a logo, or send one. Use the CLI when the work is generating or rewriting content.
+
 ## Where input comes from
 
 Stories go in as prose at `deal-map/data/notes/<slug>.md`, never as hand-written JSON.

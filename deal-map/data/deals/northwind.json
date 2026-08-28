@@ -13,7 +13,8 @@
     "outcome": "Closed Won",
     "closedDate": "2025-11-14",
     "oneLiner": "A stalled competitive displacement, restarted by finding the real economic buyer.",
-    "targetMinutes": 6
+    "targetMinutes": 6,
+    "brand": "brex"
   },
   "metrics": [
     {

@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { loadDeal, loadBrand, validateDeal } from "../src/schema.mjs";
 import { render } from "../src/render.mjs";
 import { evaluate, report } from "../evals/run.mjs";
+import { serve } from "../src/server.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P = {
@@ -40,8 +41,9 @@ function fail(msg) { console.error(`\x1b[31m${msg}\x1b[0m`); process.exit(1); }
 
 function context(over = {}) {
   const slug = over.slug || flag("deal", "northwind");
-  const brandId = over.brandId || flag("brand", "default");
   const deal = loadDeal(dealPath(slug));
+  // --brand wins; otherwise use the audience the desk set on the deal.
+  const brandId = over.brandId || flag("brand") || deal.meta.brand || "default";
   const brand = loadBrand(P.brands, brandId);
   const presenter = JSON.parse(fs.readFileSync(P.presenter, "utf8"));
   return { slug, brandId, deal, brand, presenter };
@@ -137,6 +139,14 @@ function newBrand() {
   console.log(`${bold("created")} data/brands/${id}.json ${dim(`— build with: npm run build -- --brand ${id}`)}`);
 }
 
+async function serveCmd() {
+  const port = Number(flag("port", 4173)) || 4173;
+  const { url } = await serve({ port });
+  console.log(`${bold("deal desk")} ${url}`);
+  console.log(dim("  every edit writes a file in data/ — commit them like any other change"));
+  console.log(dim("  ctrl-c to stop"));
+}
+
 function list() {
   const notes = fs.existsSync(P.notes)
     ? fs.readdirSync(P.notes).filter((f) => f.endsWith(".md") && !f.startsWith("_"))
@@ -172,11 +182,12 @@ const help = `${bold("dealmap")} — deal-review visuals for interviews
   ${bold("intake")}  <slug> [--company "Name"]                  start a raw notes file — this is where a story goes in
   ${bold("new")}     --deal <slug>                             scaffold a deal file plus its notes file
   ${bold("brand")}   <id> [--company X] [--accent #HEX]        scaffold a white-label target
+  ${bold("serve")}   [--port 4173]                             open the deal desk — the dashboard over all deals
   ${bold("list")}                                              show deals and brands
 
 ${dim("Keys in the deck: ← → step · N presenter notes · O overview · F fullscreen · 1-9 jump")}`;
 
-const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand, list };
+const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand, list, serve: serveCmd };
 try {
   if (!cmd || cmd === "help" || cmd === "--help") console.log(help);
   else if (run[cmd]) await run[cmd]();

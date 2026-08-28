@@ -8,6 +8,8 @@ talking about and dims the rest, so the audience always knows where they are in 
 have never seen. You talk; you do not read.
 
 ```
+dealmap serve            ← the desk: every deal, click in to edit, brand, check, share
+        ↓
 data/notes/<slug>.md     ← you write here. Prose, fragments, a pasted transcript.
         ↓                  deal-story-coach reads it and writes:
 data/deals/<slug>.json     the structured deal — people, obstacles, MEDDPICC, and the steps
@@ -17,7 +19,39 @@ data/presenter.json        you
 dist/<slug>-<id>.html      one self-contained file. No server, no network, no runtime build.
 ```
 
-## Use it
+## The desk
+
+One layer above a deal is the desk: every deal as a card, click into one to write it, brand it,
+check it and send it.
+
+```bash
+cd deal-map
+node bin/dealmap.mjs serve          # http://127.0.0.1:4173
+```
+
+It is a local server, not a static page, because creating a deal and editing notes, colours and
+logos all write real files under `data/`. Nothing leaves the machine, and every edit is a normal
+file change you can diff and commit.
+
+From a deal card you get four tabs and a live preview rendered at 1440×900 — the size an
+interviewer's laptop actually is, scaled down, so what you see is what they will see:
+
+| tab | what it edits |
+|---|---|
+| **Notes** | `data/notes/<slug>.md` — autosaves as you type |
+| **Story** | `data/deals/<slug>.json` — refuses to save invalid JSON or a broken reference, and tells you which |
+| **Audience** | the white-label: company, wordmark, label, logo (drag and drop), and the five-colour scheme with a live contrast readout |
+| **Checks** | the eval suite, inline, with the score |
+
+**New deal** creates the deal file and its notes file together. **Share** offers the two honest
+options: download the self-contained HTML to email or carry on a stick, or write both forms to
+`dist/` and publish the `.artifact.html` as a link, which you paste back so the desk keeps it
+with the deal. **Delete** removes the deal file and keeps your notes.
+
+Switching the audience on a deal stores it as `meta.brand`, so `dealmap build` with no `--brand`
+renders the version you last chose on the desk.
+
+## Use it from the terminal
 
 ```bash
 cd deal-map
@@ -97,6 +131,7 @@ The coach writes this file for you, but it is plain JSON and you should know wha
 - **`obstacles`** — `type` is `technical`, `political`, `legal`, `commercial`, `competitive` or
   `timing`. `resolution` is revealed when the step spotlights it.
 - **`meddpicc`** — eight entries, each with a 0-3 `score`, a `headline` and a `proof` line.
+- **`meta.brand`** — which audience this deal is prepared for (set by the desk's picker).
 - **`timeline`** — the deal path. `flag: true` marks the stall, `win: true` marks the close.
 - **`steps`** — the story. Each step has a `beat`, a title, up to three bullets, a `spotlight`
   naming the ids to light up, and `notes` (yours only, behind `N`).

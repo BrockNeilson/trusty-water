@@ -181,10 +181,10 @@
   }, { passive: true });
 
   var rt;
-  window.addEventListener("resize", function () {
-    clearTimeout(rt);
-    rt = setTimeout(function () { fitMap(); drawWires(); }, 90);
-  });
+  function relayout() { clearTimeout(rt); rt = setTimeout(function () { fitMap(); drawWires(); }, 90); }
+  window.addEventListener("resize", relayout);
+  // The deck is often rendered inside a preview frame that resizes after load.
+  if (window.ResizeObserver && elMap) new ResizeObserver(relayout).observe(elMap);
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
