@@ -1,0 +1,14 @@
+{
+  "id": "example-vanta",
+  "company": "Acme Corp",
+  "wordmark": "ACME",
+  "logo": null,
+  "preparedForLabel": "Prepared for",
+  "accent": "#2F80ED",
+  "accent2": "#7FB3FF",
+  "bg": "#0B0E14",
+  "surface": "#141922",
+  "ink": "#E8EDF5",
+  "font": "Inter",
+  "note": "Copy this file to create a new white-label target in ~30 seconds."
+}
