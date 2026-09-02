@@ -7,12 +7,16 @@ import { loadDeal, loadBrand, validateDeal } from "../src/schema.mjs";
 import { render } from "../src/render.mjs";
 import { evaluate, report } from "../evals/run.mjs";
 import { serve } from "../src/server.mjs";
+import { normalize as normAccount, validateAccount } from "../src/core/account.mjs";
+import { renderAccount } from "../src/core/render-account.mjs";
+import { deckAssets } from "../src/render.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const P = {
   deals: path.join(root, "data", "deals"),
   brands: path.join(root, "data", "brands"),
   logos: path.join(root, "data", "brands", "logos"),
+  accounts: path.join(root, "data", "accounts"),
   notes: path.join(root, "data", "notes"),
   presenter: path.join(root, "data", "presenter.json"),
   dist: path.join(root, "dist")
@@ -140,6 +144,141 @@ function newBrand() {
   console.log(`${bold("created")} data/brands/${id}.json ${dim(`— build with: npm run build -- --brand ${id}`)}`);
 }
 
+// ---- accounts: the value realisation plan that sits over the deals ----
+
+function accountPath(slug) {
+  const p = path.join(P.accounts, `${slug}.json`);
+  if (!fs.existsSync(p)) {
+    const avail = fs.existsSync(P.accounts)
+      ? fs.readdirSync(P.accounts).filter((f) => f.endsWith(".json")).map((f) => f.replace(/\.json$/, ""))
+      : [];
+    fail(`Unknown account "${slug}".${avail.length ? " Available: " + avail.join(", ") : ""}`);
+  }
+  return p;
+}
+
+function loadAccount(slug) {
+  return normAccount(JSON.parse(fs.readFileSync(accountPath(slug), "utf8")));
+}
+
+async function accountRules() {
+  const dir = path.join(root, "evals", "account-rules");
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith(".mjs")).sort();
+  return Promise.all(files.map((f) => import(path.join(dir, f))));
+}
+
+async function accountCmd() {
+  const sub = argv[1];
+  const slug = flag("account", typeof argv[2] === "string" && !argv[2].startsWith("--") ? argv[2] : "northwind");
+
+  if (sub === "list") {
+    if (!fs.existsSync(P.accounts)) return console.log(dim("no accounts yet"));
+    for (const f of fs.readdirSync(P.accounts).filter((x) => x.endsWith(".json"))) {
+      const a = JSON.parse(fs.readFileSync(path.join(P.accounts, f), "utf8"));
+      const open = (a.pipeline || []).filter((p) => p.kind === "deal" && !String(p.stage || "").startsWith("closed"));
+      console.log(`  ${f.replace(/\.json$/, "").padEnd(16)} ${dim(`${a.meta?.account || ""} · ${a.meta?.arr || "—"} ARR · ${(a.outcomes || []).length} outcomes · ${open.length} in flight${a.meta?.draft ? " · SAMPLE" : ""}`)}`);
+    }
+    return;
+  }
+
+  if (sub === "check") {
+    const a = loadAccount(slug);
+    const rules = await accountRules();
+    const results = [{ id: "schema", about: "Structure the renderer requires.",
+      findings: validateAccount(a).map((i) => ({ level: i.level, at: i.where, msg: i.msg })) }];
+    for (const r of rules) {
+      let findings = [];
+      try { findings = r.run(a) || []; }
+      catch (e) { findings = [{ level: "error", at: r.id, msg: `rule threw: ${e.message}` }]; }
+      results.push({ id: r.id, about: r.about, findings });
+    }
+    const counts = { error: 0, warn: 0, info: 0 };
+    results.forEach((r) => r.findings.forEach((f) => { counts[f.level] = (counts[f.level] || 0) + 1; }));
+    const out = { results, counts, score: Math.max(0, 100 - counts.error * 8 - counts.warn * 2), pass: counts.error === 0 };
+    console.log(report(out, { json: !!flag("json"), quiet: !!flag("quiet") }));
+    if (!out.pass && !flag("no-fail")) process.exit(1);
+    return;
+  }
+
+  if (sub === "build" || !sub) {
+    const a = loadAccount(slug);
+    const errs = validateAccount(a).filter((i) => i.level === "error");
+    if (errs.length && !flag("force")) {
+      console.error(bold("Cannot build — the account data has structural errors:"));
+      errs.forEach((e) => console.error(`  ✕ ${dim(e.where || "")} ${e.msg}`));
+      process.exit(1);
+    }
+    const brandId = flag("brand") || a.meta.brand || "default";
+    const html = renderAccount({
+      account: a, brand: loadBrand(P.brands, brandId),
+      presenter: JSON.parse(fs.readFileSync(P.presenter, "utf8")),
+      assets: deckAssets(), artifact: !!flag("artifact")
+    });
+    fs.mkdirSync(P.dist, { recursive: true });
+    const out = typeof flag("out") === "string"
+      ? path.resolve(String(flag("out")))
+      : path.join(P.dist, `${slug}-value${brandId === "default" ? "" : "-" + brandId}.html`);
+    fs.writeFileSync(out, html);
+    console.log(`${bold("built")} ${path.relative(process.cwd(), out)} ${dim(`(${(Buffer.byteLength(html) / 1024).toFixed(0)} KB · ${a.steps.length} steps · brand "${brandId}")`)}`);
+    if (a.meta.draft) console.log(`\x1b[33m!\x1b[0m ${dim("meta.draft is true — the plan shows a SAMPLE DATA badge")}`);
+    return;
+  }
+  fail(`Unknown account command "${sub}". Try: build, check, list`);
+}
+
+// A tool-agnostic feed: anything that can export rows can drive the numbers.
+function usageCmd() {
+  const slug = flag("account", typeof argv[1] === "string" && !argv[1].startsWith("--") ? argv[1] : "");
+  const file = typeof flag("file") === "string" ? String(flag("file")) : "";
+  if (!slug || !file) fail("usage: dealmap usage <account> --file <feed.csv|feed.json> [--dry-run]");
+  if (!fs.existsSync(file)) fail(`No such file: ${file}`);
+
+  const raw = fs.readFileSync(file, "utf8");
+  let rows;
+  if (file.endsWith(".json")) {
+    const j = JSON.parse(raw);
+    rows = Array.isArray(j) ? j : j.rows;
+    if (!Array.isArray(rows)) fail("JSON feed must be an array of rows, or an object with a rows array");
+  } else {
+    const lines = raw.trim().split(/\r?\n/);
+    const head = lines.shift().split(",").map((h) => h.trim());
+    const need = ["kind", "id", "field", "value"];
+    for (const n of need) if (!head.includes(n)) fail(`CSV feed needs a "${n}" column. Header was: ${head.join(", ")}`);
+    rows = lines.filter(Boolean).map((l) => {
+      const cells = l.split(",");
+      const o = {};
+      head.forEach((h, i) => { o[h] = (cells[i] || "").trim(); });
+      return o;
+    });
+  }
+
+  const p = accountPath(slug);
+  const account = JSON.parse(fs.readFileSync(p, "utf8"));
+  const FIELDS = { product: ["licensed", "active"], outcome: ["current", "baseline", "target"] };
+  const applied = [], skipped = [];
+
+  for (const r of rows) {
+    const coll = r.kind === "product" ? "products" : r.kind === "outcome" ? "outcomes" : null;
+    if (!coll || !FIELDS[r.kind].includes(r.field)) { skipped.push(`${r.kind}/${r.id}/${r.field}`); continue; }
+    const row = (account[coll] || []).find((x) => x.id === r.id);
+    if (!row) { skipped.push(`${r.kind} "${r.id}" is not in this account`); continue; }
+    const v = Number(r.value);
+    if (!Number.isFinite(v)) { skipped.push(`${r.kind}/${r.id}/${r.field} is not a number`); continue; }
+    if (row[r.field] !== v) applied.push(`${r.kind} ${r.id}.${r.field}: ${row[r.field]} → ${v}`);
+    row[r.field] = v;
+  }
+
+  account.usage = account.usage || {};
+  if (typeof flag("source") === "string") account.usage.source = String(flag("source"));
+  account.usage.updated = new Date().toISOString().slice(0, 10);
+
+  applied.forEach((a) => console.log(`  ${a}`));
+  skipped.forEach((s2) => console.log(`  ${dim("skipped " + s2)}`));
+  if (flag("dry-run")) return console.log(dim(`\ndry run — ${applied.length} change(s) not written`));
+  fs.writeFileSync(p, JSON.stringify(account, null, 2) + "\n");
+  console.log(`\n${bold(String(applied.length))} value(s) updated in data/accounts/${slug}.json. Review with git diff.`);
+}
+
 async function serveCmd() {
   const port = Number(flag("port", 4173)) || 4173;
   const { url } = await serve({ port });
@@ -227,6 +366,8 @@ const help = `${bold("dealmap")} — deal-review visuals for interviews
   ${bold("serve")}   [--port 4173]                             open the deal desk locally
   ${bold("hosted")}  [--out file]                              build the hosted desk (persists by republishing itself)
   ${bold("import")}  <export.json> [--dry-run]                 pull a hosted-desk export back into data/
+  ${bold("account")} build|check|list [slug] [--brand id]      the value realisation plan over an account
+  ${bold("usage")}   <account> --file <feed.csv>               push usage numbers in from a BI export
   ${bold("list")}                                              show deals and brands
 
 ${dim("Keys in the deck: ← → step · N presenter notes · O overview · F fullscreen · 1-9 jump")}`;
@@ -241,7 +382,7 @@ async function hosted() {
 }
 
 const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand,
-              list, serve: serveCmd, hosted, import: importExport };
+              list, serve: serveCmd, hosted, import: importExport, account: accountCmd, usage: usageCmd };
 try {
   if (!cmd || cmd === "help" || cmd === "--help") console.log(help);
   else if (run[cmd]) await run[cmd]();

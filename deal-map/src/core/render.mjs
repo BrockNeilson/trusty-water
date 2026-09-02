@@ -1,44 +1,9 @@
-// Pure renderer — takes the deck's CSS and JS as strings so it runs in Node or the browser.
+// The deal map: its zones, and the zone map the runtime uses to scroll to them.
 import { MEDDPICC, GATE_ICON } from "./deal.mjs";
-import { themeVars } from "./theme.mjs";
-
-const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+import { renderShell, esc } from "./shell.mjs";
 
 const sentClass = (n) => (n > 0 ? "pos" : n < 0 ? "neg" : "neu");
 const roleLabel = (r) => String(r || "").replace(/_/g, " ");
-
-function topbar(p, brand, meta) {
-  const mark = brand._logoData
-    ? `<img src="${brand._logoData}" alt="${esc(brand.company)}">`
-    : esc(brand.wordmark || brand.company || "");
-  const co = (brand.company || brand.wordmark)
-    ? `<div class="cobrand">
-        <span class="cobrand-label">${esc(brand.preparedForLabel || "Prepared for")}</span>
-        <span class="cobrand-rule"></span>
-        <span class="cobrand-mark">${mark}</span>
-      </div>`
-    : `<div class="cobrand"><span class="cobrand-label">${esc(brand.preparedForLabel || "Deal Review")}</span></div>`;
-  const draft = meta.draft ? `<span class="badge-draft">Sample data</span>` : "";
-  return `<header class="topbar">
-    <div class="avatar">${esc(p.initials || (p.name || "").split(/\s+/).map((w) => w[0]).join("").slice(0, 2))}</div>
-    <div class="who">
-      <div>
-        <div class="who-name">${esc(p.name)}</div>
-        <div class="who-title">${esc(p.title || "")}${p.tagline ? " · " + esc(p.tagline) : ""}</div>
-      </div>
-    </div>
-    ${draft}
-    ${co}
-  </header>`;
-}
-
-function narrative(step) {
-  return `<div class="kicker">${esc(step.kicker || step.beat || "")}</div>
-    <h1 class="step-title">${esc(step.title)}</h1>
-    <ul class="bullets">${(step.bullets || []).map((b) => `<li>${esc(b)}</li>`).join("")}</ul>
-    <div class="notes" id="notes" hidden>${step.notes ? "Note — " + esc(step.notes) : ""}</div>`;
-}
 
 function lanes(d) {
   return `<div>
@@ -118,88 +83,18 @@ function dealbar(d) {
   </div>`;
 }
 
-function metricsOverlay(d) {
-  if (!d.metrics.length) return "";
-  return `<div class="metrics" id="metrics"><div class="metrics-grid">${d.metrics.map((m) => `
-    <div class="metric"><div class="v${String(m.value || "").length > 8 ? " long" : ""}">${esc(m.value)}</div><div class="l">${esc(m.label)}</div>
-    ${m.sub ? `<div class="s">${esc(m.sub)}</div>` : ""}</div>`).join("")}</div></div>`;
-}
 
-function footer(d) {
-  return `<footer class="footer">
-    <div class="beatmap" id="beatmap">${d.steps.map(() => "<i></i>").join("")}</div>
-    <div class="navbtns">
-      <button class="navbtn" id="prev" aria-label="Previous">‹</button>
-      <button class="navbtn" id="next" aria-label="Next">›</button>
-      <button class="navbtn" id="ovbtn" aria-label="Overview">▦</button>
-    </div>
-    <div class="steps" id="steps">${d.steps.map((s, n) =>
-      `<button class="stepbtn" data-n="${n}">${esc(s.kicker || s.beat || s.title)}</button>`).join("")}</div>
-    <div class="counter" id="counter"></div>
-    <div class="keys"><kbd>←</kbd><kbd>→</kbd> step <kbd>Z</kbd> whole map <kbd>N</kbd> notes <kbd>O</kbd> steps <kbd>F</kbd> full</div>
-  </footer>`;
-}
+export const DEAL_ZONES = [[".node", "stakeholders"], [".gate", "obstacles"],
+                           [".tick", "timeline"], [".md", "meddpicc"]];
 
 export function render({ deal, brand, presenter, artifact = false, assets }) {
   const d = deal;
-  const title = `${d.meta.dealName} Deal Map`;
-  const payload = {
-    meta: d.meta,
-    steps: d.steps,
-    _edges: d._edges
-  };
-  const head = `<title>${esc(title)}</title>
-<link href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(brand.font || "Inter")}:wght@400;500;600;700&display=swap" rel="stylesheet">
-<style>
-${themeVars(brand)}
-${assets.css}
-</style>`;
-
-  const body = `<div class="stage">
-  ${topbar(presenter, brand, d.meta)}
-  <div class="body">
-    <section class="narrative anim-in" id="narrative">${narrative(d.steps[0] || { title: "" })}</section>
-    <section class="map" id="map">
-      <div class="edge top" id="edge-top"></div>
-      <div class="edge bottom" id="edge-bottom"></div>
-      <div class="map-scroll" id="map-scroll">
-      <div class="map-inner" id="map-inner">
-        <svg id="wires" preserveAspectRatio="none"></svg>
-        ${dealbar(d)}
-        ${lanes(d)}
-        ${gates(d)}
-        ${rail(d)}
-        ${medd(d)}
-      </div>
-      </div>
-      ${metricsOverlay(d)}
-    </section>
-  </div>
-  ${footer(d)}
-</div>
-<div class="overview" id="overview"></div>
-<script>
-const DEAL = ${JSON.stringify(payload).replace(/</g, "\\u003c")};
-const BRAND = ${JSON.stringify({ id: brand.id, company: brand.company }).replace(/</g, "\\u003c")};
-const PRESENTER = ${JSON.stringify(presenter).replace(/</g, "\\u003c")};
-</script>
-<script>
-${assets.js}
-</script>`;
-
-  // Artifact pages are wrapped in their own document skeleton at publish time.
-  if (artifact) return `${head}\n${body}`;
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-${head}
-</head>
-<body>
-${body}
-</body>
-</html>`;
+  return renderShell({
+    meta: d.meta, steps: d.steps, metrics: d.metrics, brand, presenter, assets, artifact,
+    title: `${d.meta.dealName} Deal Map`,
+    bar: dealbar(d),
+    zonesHtml: [lanes(d), gates(d), rail(d), medd(d)].join("\n      "),
+    zoneMap: DEAL_ZONES,
+    edges: d._edges
+  });
 }

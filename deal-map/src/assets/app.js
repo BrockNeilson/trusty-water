@@ -31,17 +31,20 @@
   }
 
   /* ---------- spotlight ---------- */
+  // Driven by the zone map the renderer injected, so it works for any map.
   function applySpotlight(step) {
     var sp = step.spotlight || {};
-    var any = !!(sp.stakeholders || sp.obstacles || sp.meddpicc || sp.timeline);
+    var any = ZONES.some(function (z) { return (sp[z[1]] || []).length > 0; });
     elMap.classList.toggle("focused", any);
-    $$(".node,.gate,.md,.tick", elInner).forEach(function (n) { n.classList.remove("hot"); });
-    (sp.stakeholders || []).forEach(function (id) { mark('.node[data-id="' + id + '"]'); });
-    (sp.obstacles || []).forEach(function (id) { mark('.gate[data-id="' + id + '"]'); });
-    (sp.meddpicc || []).forEach(function (k) { mark('.md[data-id="' + k + '"]'); });
-    (sp.timeline || []).forEach(function (id) { mark('.tick[data-id="' + id + '"]'); });
+    $$(ZONES.map(function (z) { return z[0]; }).join(","), elInner)
+      .forEach(function (n) { n.classList.remove("hot"); });
+    ZONES.forEach(function (z) {
+      (sp[z[1]] || []).forEach(function (id) { mark(z[0] + '[data-id="' + cssEsc(id) + '"]'); });
+    });
     return sp;
   }
+
+  function cssEsc(s) { return String(s).replace(/["\\]/g, "\\$&"); }
 
   function paintSpotlight() {
     var sp = applySpotlight(steps[i]);
@@ -54,7 +57,8 @@
      presenter — so every step has to land on its own content. When a step lights
      elements across more zones than fit on one screen, centre its primary zone:
      spotlight.focus if the deal names one, otherwise whichever zone it lit most. */
-  var ZONES = [[".node", "stakeholders"], [".gate", "obstacles"], [".tick", "timeline"], [".md", "meddpicc"]];
+  // Supplied by whichever map rendered this deck.
+  var ZONES = (DEAL._zones || []).map(function (z) { return [z[0], z[1]]; });
 
   function boxOf(list, base) {
     var t = Infinity, b = -Infinity;
