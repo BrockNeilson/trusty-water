@@ -2,14 +2,16 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --r:10px; --r-lg:16px;
-  --line:color-mix(in srgb, var(--ink) 12%, transparent);
-  --line-soft:color-mix(in srgb, var(--ink) 7%, transparent);
-  --muted:color-mix(in srgb, var(--ink) 55%, transparent);
-  --faint:color-mix(in srgb, var(--ink) 38%, transparent);
-  --pos:#3FBF7F; --neg:#E5615C; --neu:#8A93A6;
+  /* Every colour below comes from the theme compiler, which proves its contrast
+     against this brand's background before it is written. Nothing here is a literal. */
+  --muted:var(--ink-muted);
+  --faint:var(--ink-faint);
+  --pos:var(--ok);
+  --neg:var(--risk);
+  --neu:var(--neutral);
+  --accent2:var(--accent-2);
   --ease:cubic-bezier(.22,.8,.28,1);
   --dur:.42s;
-  color-scheme:dark;
 }
 html,body{height:100%}
 body{
@@ -32,7 +34,7 @@ body::before{ /* ambient brand wash */
 .who{display:flex;align-items:center;gap:11px;min-width:0;flex:1}
 .who > div{min-width:0}
 .avatar{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:none;
-  background:linear-gradient(140deg,var(--accent),var(--accent2));color:#0b0b0d;font-weight:700;font-size:12.5px;letter-spacing:.02em}
+  background:linear-gradient(140deg,var(--accent),var(--accent2));color:var(--on-accent);font-weight:700;font-size:12.5px;letter-spacing:.02em}
 .who-name{font-weight:640;font-size:16px;letter-spacing:-.01em;white-space:nowrap}
 .who-title{font-size:12.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cobrand{margin-left:auto;display:flex;align-items:center;gap:13px;flex:none}
@@ -40,7 +42,7 @@ body::before{ /* ambient brand wash */
 .cobrand-rule{width:1px;height:26px;background:var(--line)}
 .cobrand-mark{font-weight:700;font-size:17px;letter-spacing:-.02em;color:var(--ink)}
 .cobrand-mark img{max-height:26px;width:auto;display:block}
-.badge-draft{flex:none;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:#0b0b0d;background:#F5C451;
+.badge-draft{flex:none;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--on-warn);background:var(--warn);
   padding:3px 8px;border-radius:99px;font-weight:700}
 
 /* ---------- body split ---------- */
@@ -167,7 +169,7 @@ body::before{ /* ambient brand wash */
   transition:max-height var(--dur) var(--ease),opacity var(--dur),margin var(--dur)}
 
 /* ---------- spotlight system ---------- */
-.map.focused .node,.map.focused .gate,.map.focused .md,.map.focused .tick{opacity:.34}
+.map.focused .node,.map.focused .gate,.map.focused .md,.map.focused .tick{opacity:var(--dim)}
 .map.focused .node.hot,.map.focused .gate.hot,.map.focused .md.hot,.map.focused .tick.hot{opacity:1}
 .node.hot{border-color:color-mix(in srgb,var(--accent) 65%,transparent);transform:translateY(-2px);
   box-shadow:0 8px 26px -14px color-mix(in srgb,var(--accent) 80%,transparent)}
@@ -250,7 +252,7 @@ body::before{ /* ambient brand wash */
   #wires{display:none}
   /* details stay open on a small screen — there is no hover and no room to expand */
   .node .n-note,.gate .g-res,.md .m-proof{max-height:none;opacity:1;margin-top:5px}
-  .map.focused .node,.map.focused .gate,.map.focused .md,.map.focused .tick{opacity:.5}
+  .map.focused .node,.map.focused .gate,.map.focused .md,.map.focused .tick{opacity:calc(var(--dim) + .16)}
   .footer{position:sticky;bottom:0;background:var(--bg);flex-wrap:wrap;gap:8px;padding:8px 16px 12px}
   .keys{display:none}
   .metrics{position:fixed}
@@ -275,7 +277,7 @@ body::before{ /* ambient brand wash */
 
 /* ---------- value realisation map ---------- */
 .pill.health-green{border-color:color-mix(in srgb,var(--pos) 45%,transparent);color:var(--pos)}
-.pill.health-amber{border-color:color-mix(in srgb,#E0A23C 55%,transparent);color:#E0A23C}
+.pill.health-amber{border-color:color-mix(in srgb,var(--warn) 55%,transparent);color:var(--warn)}
 .pill.health-red{border-color:color-mix(in srgb,var(--neg) 50%,transparent);color:var(--neg)}
 
 .outcomes{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
@@ -288,13 +290,13 @@ body::before{ /* ambient brand wash */
   padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
 .outcome[data-status="on_track"] .o-status,.outcome[data-status="realised"] .o-status{
   color:var(--pos);border-color:color-mix(in srgb,var(--pos) 45%,transparent)}
-.outcome[data-status="at_risk"] .o-status{color:#E0A23C;border-color:color-mix(in srgb,#E0A23C 50%,transparent)}
+.outcome[data-status="at_risk"] .o-status{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 50%,transparent)}
 .outcome[data-status="behind"] .o-status{color:var(--neg);border-color:color-mix(in srgb,var(--neg) 50%,transparent)}
 .o-metric{font-size:12.5px;color:var(--faint);margin-bottom:11px}
 .meter{margin-bottom:8px}
 .meter-track{height:8px;border-radius:99px;background:color-mix(in srgb,var(--ink) 10%,transparent);overflow:hidden}
 .meter-fill{height:100%;border-radius:99px;background:var(--accent);transition:width var(--dur) var(--ease)}
-.outcome[data-status="at_risk"] .meter-fill{background:#E0A23C}
+.outcome[data-status="at_risk"] .meter-fill{background:var(--warn)}
 .outcome[data-status="behind"] .meter-fill{background:var(--neg)}
 .outcome[data-status="realised"] .meter-fill{background:var(--pos)}
 .meter-scale{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:12px;color:var(--faint);
@@ -337,7 +339,7 @@ body::before{ /* ambient brand wash */
 .e-sub{font-size:12.5px;color:var(--muted);margin-top:4px}
 .econ-note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.5}
 
-.map.focused .outcome,.map.focused .prod,.map.focused .pipe,.map.focused .econ{opacity:.34}
+.map.focused .outcome,.map.focused .prod,.map.focused .pipe,.map.focused .econ{opacity:var(--dim)}
 .map.focused .outcome.hot,.map.focused .prod.hot,.map.focused .pipe.hot,.map.focused .econ.hot{opacity:1}
 .outcome.hot,.prod.hot,.pipe.hot,.econ.hot{border-color:color-mix(in srgb,var(--accent) 65%,transparent);
   transform:translateY(-2px);box-shadow:0 8px 26px -14px color-mix(in srgb,var(--accent) 80%,transparent)}

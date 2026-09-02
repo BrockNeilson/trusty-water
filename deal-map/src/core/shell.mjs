@@ -2,7 +2,7 @@
 // metric overlay and the document itself. A map supplies its own zones.
 import { themeVars } from "./theme.mjs";
 
-const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+export const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
 
@@ -116,7 +116,6 @@ ${body}
 </html>`;
 }
 
-export { esc };
 const sentClass = (n) => (n > 0 ? "pos" : n < 0 ? "neg" : "neu");
 const roleLabel = (r) => String(r || "").replace(/_/g, " ");
 

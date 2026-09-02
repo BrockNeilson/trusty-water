@@ -8,6 +8,7 @@ import { render } from "../src/render.mjs";
 import { evaluate, report } from "../evals/run.mjs";
 import { serve } from "../src/server.mjs";
 import { normalize as normAccount, validateAccount } from "../src/core/account.mjs";
+import { buildTheme, contrast } from "../src/core/theme.mjs";
 import { renderAccount } from "../src/core/render-account.mjs";
 import { deckAssets } from "../src/render.mjs";
 
@@ -279,6 +280,46 @@ function usageCmd() {
   console.log(`\n${bold(String(applied.length))} value(s) updated in data/accounts/${slug}.json. Review with git diff.`);
 }
 
+// What a brand actually resolves to, and whether every pair is readable.
+function skinCmd() {
+  const id = typeof argv[1] === "string" && !argv[1].startsWith("--") ? argv[1] : String(flag("brand", "default"));
+  const brand = loadBrand(P.brands, id);
+  const { vars, report, light } = buildTheme(brand);
+  console.log(`${bold(brand.company || id)} ${dim(`(${light ? "light" : "dark"} ground)`)}`);
+  console.log();
+  const swatch = (hex) => {
+    const m = /^#(..)(..)(..)$/.exec(hex);
+    if (!m) return "  ";
+    const [r, g, b] = m.slice(1).map((h) => parseInt(h, 16));
+    return `\x1b[48;2;${r};${g};${b}m  \x1b[0m`;
+  };
+  for (const [k, v] of Object.entries(vars)) {
+    if (!/^#/.test(String(v))) continue;
+    console.log(`  ${swatch(v)} ${k.padEnd(14)} ${dim(v)}`);
+  }
+  console.log();
+  const pairs = [
+    ["body text on background", vars["--ink"], vars["--bg"], 7],
+    ["muted text", vars["--ink-muted"], vars["--bg"], 4.5],
+    ["accent as text", vars["--accent-ink"], vars["--bg"], 4.5],
+    ["text on an accent fill", vars["--on-accent"], vars["--accent"], 4.5],
+    ["on track", vars["--ok"], vars["--bg"], 4.5],
+    ["at risk", vars["--warn"], vars["--bg"], 4.5],
+    ["behind", vars["--risk"], vars["--bg"], 4.5]
+  ];
+  for (const [label, fg, bgc, min] of pairs) {
+    const r = contrast(fg, bgc);
+    const ok = r !== null && r >= min;
+    console.log(`  ${ok ? "\x1b[32m✓\x1b[0m" : "\x1b[31m✕\x1b[0m"} ${label.padEnd(24)} ${String(r).padStart(6)}:1 ${dim("want " + min + "+")}`);
+  }
+  if (report.length) {
+    console.log();
+    for (const r of report) console.log(`  ${r.level === "error" ? "\x1b[31m✕\x1b[0m" : "\x1b[33m!\x1b[0m"} ${r.msg}`);
+  } else {
+    console.log(`\n  ${dim("nothing needed repair")}`);
+  }
+}
+
 async function serveCmd() {
   const port = Number(flag("port", 4173)) || 4173;
   const { url } = await serve({ port });
@@ -363,6 +404,7 @@ const help = `${bold("dealmap")} — deal-review visuals for interviews
   ${bold("intake")}  <slug> [--company "Name"]                  start a raw notes file — this is where a story goes in
   ${bold("new")}     --deal <slug>                             scaffold a deal file plus its notes file
   ${bold("brand")}   <id> [--company X] [--accent #HEX]        scaffold a white-label target
+  ${bold("skin")}    <brand-id>                                show the resolved tokens and every contrast pair
   ${bold("serve")}   [--port 4173]                             open the deal desk locally
   ${bold("hosted")}  [--out file]                              build the hosted desk (persists by republishing itself)
   ${bold("import")}  <export.json> [--dry-run]                 pull a hosted-desk export back into data/
@@ -382,7 +424,7 @@ async function hosted() {
 }
 
 const run = { build, "build-all": buildAll, check, intake, new: newDeal, brand: newBrand,
-              list, serve: serveCmd, hosted, import: importExport, account: accountCmd, usage: usageCmd };
+              list, serve: serveCmd, hosted, import: importExport, account: accountCmd, usage: usageCmd, skin: skinCmd };
 try {
   if (!cmd || cmd === "help" || cmd === "--help") console.log(help);
   else if (run[cmd]) await run[cmd]();
