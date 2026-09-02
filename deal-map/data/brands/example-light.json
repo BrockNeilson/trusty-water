@@ -1,0 +1,14 @@
+{
+  "id": "example-light",
+  "company": "Meridian Health",
+  "wordmark": "MERIDIAN",
+  "logo": null,
+  "preparedForLabel": "Prepared for",
+  "accent": "#0B5FFF",
+  "accent2": "#5B8DEF",
+  "bg": "#FFFFFF",
+  "surface": "#F4F6F9",
+  "ink": "#101418",
+  "font": "Inter",
+  "note": "A light-ground skin. Status colours invert automatically and are re-validated against white."
+}

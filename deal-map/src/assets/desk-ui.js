@@ -234,14 +234,31 @@
     });
   }
 
+  // Every pair the theme compiler checks, plus anything it had to repair.
   function contrastLine() {
     var b = brandOf(curBrand), el = $("#contrast");
     if (!el) return;
-    var ca = contrast(b.accent, b.bg), ci = contrast(b.ink, b.bg);
-    var w = function (v, min) { return v != null && v < min ? ' style="color:var(--warn)"' : ""; };
-    el.innerHTML = '<span class="m"' + w(ca, 4.5) + ">accent on background <b>" + (ca || "?") +
-      ":1</b> (want 4.5+)</span><span class=\"m\"" + w(ci, 7) + ">text on background <b>" +
-      (ci || "?") + ":1</b> (want 7+)</span>";
+    var t;
+    try { t = buildTheme(b); } catch (e) { el.textContent = ""; return; }
+    var v = t.vars;
+    var pairs = [
+      ["body text", v["--ink"], v["--bg"], 7],
+      ["muted text", v["--ink-muted"], v["--bg"], 4.5],
+      ["accent as text", v["--accent-ink"], v["--bg"], 4.5],
+      ["on an accent fill", v["--on-accent"], v["--accent"], 4.5],
+      ["on track", v["--ok"], v["--bg"], 4.5],
+      ["at risk", v["--warn"], v["--bg"], 4.5],
+      ["behind", v["--risk"], v["--bg"], 4.5]
+    ];
+    el.innerHTML = pairs.map(function (p) {
+      var r = contrast(p[1], p[2]), bad = r != null && r < p[3];
+      return '<span class="m' + (bad ? " bad" : "") + '">' + esc(p[0]) + " <b>" + (r == null ? "?" : r) + ":1</b></span>";
+    }).join("") +
+      (t.report.length
+        ? '<div class="theme-report">' + t.report.map(function (r) {
+            return '<div class="' + (r.level === "error" ? "bad" : "warn") + '">' + esc(r.msg) + "</div>";
+          }).join("") + "</div>"
+        : '<div class="theme-report ok">Every pair is readable on this background.</div>');
   }
 
   function flash(sel) {

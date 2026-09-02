@@ -193,6 +193,45 @@ The coach writes this file for you, but it is plain JSON and you should know wha
 
 Set `"draft": false` when the content is genuinely yours.
 
+## Skinning
+
+Every colour in the deck, the value plan and the desk comes from a **theme compiler**, not from
+a literal in a stylesheet. A brand supplies four or five colours; the compiler derives the rest
+and *proves* each one is readable before it is written:
+
+```bash
+node bin/dealmap.mjs skin brex          # the resolved tokens and every contrast pair
+```
+
+| token | what it is |
+|---|---|
+| `--bg` `--surface` `--surface-2` | the grounds |
+| `--ink` `--ink-muted` `--ink-faint` | text, in three weights, each checked against the ground |
+| `--line` `--line-soft` | borders, derived from ink so they follow a light or dark ground |
+| `--accent` `--accent-2` | the brand |
+| `--accent-ink` | the accent **as text** — darkened or lightened if the raw brand colour cannot carry text |
+| `--on-accent` | what to write *on* an accent fill, black or white, whichever wins |
+| `--ok` `--warn` `--risk` `--neutral` | status, reserved — never the brand's colours |
+| `--dim` | how far the map recedes when a step is not lighting it |
+
+Three things it does that a plain variable swap does not:
+
+- **A light ground just works.** Set `"bg": "#FFFFFF"` and the neutrals, borders, status colours
+  and dim level all invert. There is no light theme to maintain — it is the same tokens resolved
+  against a different ground.
+- **An unreadable accent is repaired, not shipped.** A pale yellow on white stays the accent for
+  fills, but `--accent-ink` becomes a darkened version that clears 4.5:1, and the `presentability`
+  eval says so.
+- **Status colours are reserved and validated.** They never come from the brand — a brand hue
+  cannot be trusted to mean "at risk". The two triads (one per ground) were chosen by running a
+  palette validator: CVD ΔE 11.2 dark / 8.7 light, normal-vision ΔE 18.9 / 15.4, all above 4.5:1.
+  "Behind" leans purple-red rather than pure red on purpose — against amber, a true red collapses
+  under deuteranopia. Every status also carries a written label, so colour is never the only channel.
+
+The desk skins too: put a `deskBrand` in `data/presenter.json` and it takes the same tokens. Leave
+it out and it keeps its own graphite-and-brass identity, so you can tell the workshop from the
+thing being presented.
+
 ## White-label it
 
 ```bash
