@@ -19,9 +19,14 @@ const core = () => bundle([path.join(here, "core", "deal.mjs"), path.join(here, 
 function deskBrand() {
   try {
     const p = JSON.parse(fs.readFileSync(path.join(here, "..", "data", "presenter.json"), "utf8"));
-    return p.deskBrand || {};
-  } catch (e) { return {}; }
+    const b = p.deskBrand;
+    return b && Object.keys(b).length ? b : null;
+  } catch (e) { return null; }
 }
+
+// No skin means no theme block at all — an empty brand would resolve to the deck's
+// defaults and quietly overwrite the desk's own identity.
+const deskTheme = () => { const b = deskBrand(); return b ? `<style>${themeVars(b)}</style>` : ""; };
 
 export function dashboardPage() {
   return `<!doctype html>
@@ -34,7 +39,7 @@ export function dashboardPage() {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <style>${asset("desk.css")}</style>
-<style>${themeVars(deskBrand())}</style>
+${deskTheme()}
 </head>
 <body>
 ${asset("desk.html")}
