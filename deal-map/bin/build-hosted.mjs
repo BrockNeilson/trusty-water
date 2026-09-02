@@ -43,6 +43,13 @@ function currentState() {
 
 const safe = (s) => s.replace(/<\/script/gi, "<\\/script");
 
+// Only skin the desk when a skin was actually set; an empty brand resolves to the
+// deck's defaults and would overwrite the desk's own identity.
+function deskTheme() {
+  const b = readJson("data/presenter.json").deskBrand;
+  return b && Object.keys(b).length ? `<style>${themeVars(b)}</style>` : "";
+}
+
 export function buildHosted() {
   const core = bundle([path.join(root, "src/core/render.mjs")], { root });
   const ruleFiles = fs.readdirSync(path.join(root, "evals/rules"))
@@ -65,7 +72,7 @@ export function buildHosted() {
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <style>${read("src/assets/desk.css")}</style>
-<style>${themeVars(readJson("data/presenter.json").deskBrand || {})}</style>
+${deskTheme()}
 </head>
 <body>
 ${read("src/assets/desk.html")}
