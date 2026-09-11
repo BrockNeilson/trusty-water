@@ -1,0 +1,81 @@
+name: Publish decks to Pages
+
+# Builds every deck marked `"publish": true` and deploys them.
+# Publishing is opt-in: this repository is public, so nothing is deployed unless
+# its meta.publish is explicitly true. Value plans are opt-in even then.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deal-map/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; let a newer push finish rather than queueing behind an old one.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # No dependencies to install — the tool is plain Node.
+
+      - name: Check every deal and account before publishing anything
+        working-directory: deal-map
+        run: |
+          fail=0
+          for f in data/deals/*.json; do
+            slug=$(basename "$f" .json)
+            node bin/dealmap.mjs check --deal "$slug" --no-fail --quiet || fail=1
+          done
+          for f in data/accounts/*.json; do
+            [ -e "$f" ] || continue
+            slug=$(basename "$f" .json)
+            node bin/dealmap.mjs account check "$slug" --no-fail --quiet || fail=1
+          done
+          exit $fail
+
+      - name: Build the site
+        working-directory: deal-map
+        run: node bin/site.mjs ../_site
+
+      - name: Fail if a value plan slipped in without being opted in
+        run: |
+          for f in _site/*-value.html; do
+            [ -e "$f" ] || continue
+            slug=$(basename "$f" -value.html)
+            if ! grep -q '"publish": *true' "deal-map/data/accounts/$slug.json"; then
+              echo "::error::$slug-value.html was built but its account is not marked publish:true"
+              exit 1
+            fi
+          done
+          echo "publish gate clean"
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

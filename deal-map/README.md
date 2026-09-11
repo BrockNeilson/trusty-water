@@ -95,6 +95,34 @@ full map, spotlight intact.
 It is one HTML file. Email it, put it on a USB stick, open it on their laptop. It renders
 offline; the web font is the only network call and it falls back cleanly.
 
+## Publishing to the web
+
+`.github/workflows/pages.yml` builds every publishable deck on a push to `main` and deploys
+them to GitHub Pages. The index lists what went out.
+
+```bash
+node bin/site.mjs                      # build the site locally into dist/site
+node bin/site.mjs --include-drafts     # preview everything, including unpublished deals
+```
+
+**Publishing is opt-in, and deliberately awkward.** This repository is public, so nothing is
+deployed unless its `meta.publish` is literally `true`:
+
+| | |
+|---|---|
+| a deal | published when `meta.publish` is `true` |
+| an account | published when `meta.publish` is `true` — and `--include-drafts` will never sweep one in |
+
+A value realisation plan holds a customer's ARR, adoption, named executives and renewal exposure.
+That does not belong on a public URL. The workflow has a second gate that fails the build if a
+value plan is ever produced without its account being explicitly opted in, so a stray flag cannot
+quietly put customer economics on the internet.
+
+If you want real customer data in this repo at all, make the repository private first, or keep
+`data/accounts/` out of git and let the hosted desk hold it.
+
+The site is `noindex` — a link you hand someone, not something that shows up in search.
+
 ## The hosted desk
 
 `node bin/dealmap.mjs hosted` builds a single page that is the whole desk — the deals, the
