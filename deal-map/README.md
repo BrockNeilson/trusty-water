@@ -95,6 +95,34 @@ full map, spotlight intact.
 It is one HTML file. Email it, put it on a USB stick, open it on their laptop. It renders
 offline; the web font is the only network call and it falls back cleanly.
 
+## Publishing to the web
+
+`.github/workflows/pages.yml` builds every publishable deck on a push to `main` and deploys
+them to GitHub Pages. The index lists what went out.
+
+```bash
+node bin/site.mjs                      # build the site locally into dist/site
+node bin/site.mjs --include-drafts     # preview everything, including unpublished deals
+```
+
+**Publishing is opt-in, and deliberately awkward.** This repository is public, so nothing is
+deployed unless its `meta.publish` is literally `true`:
+
+| | |
+|---|---|
+| a deal | published when `meta.publish` is `true` |
+| an account | published when `meta.publish` is `true` — and `--include-drafts` will never sweep one in |
+
+A value realisation plan holds a customer's ARR, adoption, named executives and renewal exposure.
+That does not belong on a public URL. The workflow has a second gate that fails the build if a
+value plan is ever produced without its account being explicitly opted in, so a stray flag cannot
+quietly put customer economics on the internet.
+
+If you want real customer data in this repo at all, make the repository private first, or keep
+`data/accounts/` out of git and let the hosted desk hold it.
+
+The site is `noindex` — a link you hand someone, not something that shows up in search.
+
 ## The hosted desk
 
 `node bin/dealmap.mjs hosted` builds a single page that is the whole desk — the deals, the
@@ -192,6 +220,45 @@ The coach writes this file for you, but it is plain JSON and you should know wha
   zone the map should scroll to when the step lights more than one.
 
 Set `"draft": false` when the content is genuinely yours.
+
+## Skinning
+
+Every colour in the deck, the value plan and the desk comes from a **theme compiler**, not from
+a literal in a stylesheet. A brand supplies four or five colours; the compiler derives the rest
+and *proves* each one is readable before it is written:
+
+```bash
+node bin/dealmap.mjs skin brex          # the resolved tokens and every contrast pair
+```
+
+| token | what it is |
+|---|---|
+| `--bg` `--surface` `--surface-2` | the grounds |
+| `--ink` `--ink-muted` `--ink-faint` | text, in three weights, each checked against the ground |
+| `--line` `--line-soft` | borders, derived from ink so they follow a light or dark ground |
+| `--accent` `--accent-2` | the brand |
+| `--accent-ink` | the accent **as text** — darkened or lightened if the raw brand colour cannot carry text |
+| `--on-accent` | what to write *on* an accent fill, black or white, whichever wins |
+| `--ok` `--warn` `--risk` `--neutral` | status, reserved — never the brand's colours |
+| `--dim` | how far the map recedes when a step is not lighting it |
+
+Three things it does that a plain variable swap does not:
+
+- **A light ground just works.** Set `"bg": "#FFFFFF"` and the neutrals, borders, status colours
+  and dim level all invert. There is no light theme to maintain — it is the same tokens resolved
+  against a different ground.
+- **An unreadable accent is repaired, not shipped.** A pale yellow on white stays the accent for
+  fills, but `--accent-ink` becomes a darkened version that clears 4.5:1, and the `presentability`
+  eval says so.
+- **Status colours are reserved and validated.** They never come from the brand — a brand hue
+  cannot be trusted to mean "at risk". The two triads (one per ground) were chosen by running a
+  palette validator: CVD ΔE 11.2 dark / 8.7 light, normal-vision ΔE 18.9 / 15.4, all above 4.5:1.
+  "Behind" leans purple-red rather than pure red on purpose — against amber, a true red collapses
+  under deuteranopia. Every status also carries a written label, so colour is never the only channel.
+
+The desk skins too: put a `deskBrand` in `data/presenter.json` and it takes the same tokens. Leave
+it out and it keeps its own graphite-and-brass identity, so you can tell the workshop from the
+thing being presented.
 
 ## White-label it
 

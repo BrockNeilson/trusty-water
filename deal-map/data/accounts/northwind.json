@@ -1,0 +1,354 @@
+{
+  "meta": {
+    "slug": "northwind",
+    "draft": true,
+    "account": "Northwind Logistics",
+    "industry": "Freight & 3PL · 14,000 employees",
+    "segment": "Enterprise",
+    "arr": "$1.24M",
+    "renewal": "Nov 2028",
+    "since": "Nov 2025",
+    "health": "amber",
+    "csm": "Priya Raman (Controller, exec sponsor)",
+    "brand": "brex",
+    "targetMinutes": 8,
+    "oneLiner": "Adoption is ahead of plan in Finance and behind in the field — the renewal case depends on closing that gap."
+  },
+  "usage": {
+    "source": "Snowflake → weekly export",
+    "updated": "week of Sep 14",
+    "note": "Seat activity and approval cycle times. See data/accounts/README for the feed shape."
+  },
+  "outcomes": [
+    {
+      "id": "close",
+      "title": "Close the books in 5 days",
+      "metric": "Days to close, month end",
+      "unit": "d",
+      "baseline": 11,
+      "current": 7,
+      "target": 5,
+      "owner": "Priya Raman, Controller",
+      "status": "on_track",
+      "note": "Two of the three subsidiaries still reconcile by hand — that is the remaining two days."
+    },
+    {
+      "id": "audit",
+      "title": "Clean FY26 audit",
+      "metric": "Repeat findings on expense approvals",
+      "unit": "",
+      "baseline": 2,
+      "current": 0,
+      "target": 0,
+      "owner": "Dana Okafor, CFO",
+      "status": "realised",
+      "note": "The board commitment that funded the purchase. Zero findings at the interim review."
+    },
+    {
+      "id": "receipts",
+      "title": "Retire paper receipts",
+      "metric": "Drivers submitting on mobile",
+      "unit": "%",
+      "baseline": 0,
+      "current": 34,
+      "target": 90,
+      "owner": "Lena Cruz, VP Field Ops",
+      "status": "at_risk",
+      "note": "Rollout stalled at depot 3. This is the one that decides the renewal."
+    },
+    {
+      "id": "spend",
+      "title": "Unreconciled spend under $250K",
+      "metric": "Spend unreconciled at month end",
+      "unit": "",
+      "baseline": 2100000,
+      "current": 780000,
+      "target": 250000,
+      "owner": "Marcus Hale, VP Finance",
+      "status": "on_track",
+      "note": "Tracks the receipts rollout — it cannot finish before that does."
+    }
+  ],
+  "products": [
+    {
+      "id": "cards",
+      "name": "Corporate cards",
+      "licensed": 900,
+      "active": 812,
+      "unit": "cards",
+      "note": "Finance and ops fully issued."
+    },
+    {
+      "id": "expense",
+      "name": "Expense",
+      "licensed": 2400,
+      "active": 816,
+      "unit": "seats",
+      "note": "Depot 3 has not started. 640 of the gap sits there."
+    },
+    {
+      "id": "ap",
+      "name": "Bill pay",
+      "licensed": 40,
+      "active": 37,
+      "unit": "seats"
+    },
+    {
+      "id": "travel",
+      "name": "Travel",
+      "licensed": 0,
+      "active": 0,
+      "unit": "seats",
+      "note": "Not licensed. See whitespace."
+    }
+  ],
+  "pipeline": [
+    {
+      "id": "p-orig",
+      "kind": "deal",
+      "name": "Original platform deal",
+      "stage": "closed_won",
+      "value": "$1.24M",
+      "close": "Nov 2025",
+      "deal": "northwind",
+      "note": "The deal map covers how this was won."
+    },
+    {
+      "id": "p-subs",
+      "kind": "deal",
+      "name": "Subsidiaries 4-6 expansion",
+      "stage": "negotiation",
+      "value": "$410K",
+      "close": "Dec 2026",
+      "note": "Priced. Waiting on the depot 3 adoption number."
+    },
+    {
+      "id": "p-travel",
+      "kind": "whitespace",
+      "name": "Travel",
+      "stage": "idea",
+      "value": "$180K",
+      "note": "Ops books through an agency today. Contract ends Q3."
+    },
+    {
+      "id": "p-eu",
+      "kind": "whitespace",
+      "name": "EU entity",
+      "stage": "idea",
+      "value": "$300K",
+      "note": "Blocked until the EU data residency question is answered."
+    }
+  ],
+  "plan": [
+    {
+      "id": "m1",
+      "date": "Dec 2025",
+      "label": "Go live, Finance",
+      "owner": "Priya",
+      "status": "done"
+    },
+    {
+      "id": "m2",
+      "date": "Mar 2026",
+      "label": "First clean close",
+      "owner": "Priya",
+      "status": "done",
+      "win": true
+    },
+    {
+      "id": "m3",
+      "date": "Jun 2026",
+      "label": "Depots 1-2 mobile rollout",
+      "owner": "Lena",
+      "status": "done"
+    },
+    {
+      "id": "m4",
+      "date": "Sep 2026",
+      "label": "Depot 3 stalled",
+      "owner": "Lena",
+      "status": "blocked",
+      "flag": true
+    },
+    {
+      "id": "m5",
+      "date": "Nov 2026",
+      "label": "Exec business review",
+      "owner": "Dana",
+      "status": "next"
+    },
+    {
+      "id": "m6",
+      "date": "Jan 2027",
+      "label": "Subsidiaries 4-6 live",
+      "owner": "Marcus",
+      "status": "planned"
+    }
+  ],
+  "economics": {
+    "tiles": [
+      {
+        "label": "Invested",
+        "value": "$1.24M",
+        "sub": "Year 1 of a 3-year term"
+      },
+      {
+        "label": "Realised",
+        "value": "$2.9M",
+        "sub": "Audit remediation + close-cycle hours"
+      },
+      {
+        "label": "Return",
+        "value": "2.3x",
+        "sub": "Against year-one spend"
+      },
+      {
+        "label": "At renewal",
+        "value": "$3.7M",
+        "sub": "TCV exposed in Nov 2028"
+      }
+    ],
+    "note": "Realised value is the customer's own finance model, not ours — Marcus builds it for the board each quarter."
+  },
+  "steps": [
+    {
+      "id": "a1",
+      "beat": "setup",
+      "kicker": "The account",
+      "title": "Where Northwind stands",
+      "bullets": [
+        "$1.24M ARR, one year in",
+        "Health amber, renewal Nov 2028",
+        "Two outcomes landed, one at risk"
+      ],
+      "spotlight": {
+        "products": [
+          "cards",
+          "expense"
+        ],
+        "focus": "products"
+      },
+      "notes": "Open on the number and the health flag. Do not bury the amber."
+    },
+    {
+      "id": "a2",
+      "beat": "stakes",
+      "kicker": "What they bought it for",
+      "title": "Three promises we made",
+      "bullets": [
+        "Close the books in 5 days",
+        "A clean FY26 audit",
+        "Retire 2,400 paper receipts"
+      ],
+      "spotlight": {
+        "outcomes": [
+          "close",
+          "audit",
+          "receipts"
+        ],
+        "focus": "outcomes"
+      },
+      "notes": "These are their words from the business case, not our feature list."
+    },
+    {
+      "id": "a3",
+      "beat": "proof",
+      "kicker": "What has landed",
+      "title": "Two of three, on the numbers",
+      "bullets": [
+        "Close cycle 11 days to 7",
+        "Zero repeat audit findings",
+        "Unreconciled spend down 63%"
+      ],
+      "spotlight": {
+        "outcomes": [
+          "close",
+          "audit",
+          "spend"
+        ],
+        "focus": "outcomes"
+      },
+      "notes": "Lead with the audit — it is the one the CFO committed to the board."
+    },
+    {
+      "id": "a4",
+      "beat": "conflict",
+      "kicker": "What has not",
+      "title": "Depot 3 never started",
+      "bullets": [
+        "34% of drivers on mobile, target 90%",
+        "640 of the gap sits in one depot",
+        "Rollout owner changed in June"
+      ],
+      "spotlight": {
+        "outcomes": [
+          "receipts"
+        ],
+        "products": [
+          "expense"
+        ],
+        "plan": [
+          "m4"
+        ],
+        "focus": "outcomes"
+      },
+      "notes": "Own this before they raise it. The cause is an owner change, not the product."
+    },
+    {
+      "id": "a5",
+      "beat": "turn",
+      "kicker": "The plan",
+      "title": "Close the gap by January",
+      "bullets": [
+        "Depot 3 restart, Lena owns it",
+        "Exec business review in November",
+        "Subsidiaries 4-6 live in January"
+      ],
+      "spotlight": {
+        "plan": [
+          "m4",
+          "m5",
+          "m6"
+        ],
+        "focus": "plan"
+      },
+      "notes": "Name the owner and the date for each. A plan without both is a wish."
+    },
+    {
+      "id": "a6",
+      "beat": "close",
+      "kicker": "In flight",
+      "title": "$410K priced, $480K open",
+      "bullets": [
+        "Subsidiaries 4-6 in negotiation",
+        "Travel contract ends Q3",
+        "EU blocked on data residency"
+      ],
+      "spotlight": {
+        "pipeline": [
+          "p-subs",
+          "p-travel",
+          "p-eu"
+        ],
+        "focus": "pipeline"
+      },
+      "notes": "The expansion is gated on the depot 3 number. Say that plainly."
+    },
+    {
+      "id": "a7",
+      "beat": "result",
+      "kicker": "The economics",
+      "title": "$2.9M realised on $1.24M",
+      "bullets": [
+        "2.3x against year-one spend",
+        "Their finance model, not ours",
+        "$3.7M exposed at renewal"
+      ],
+      "spotlight": {
+        "focus": "economics",
+        "metrics": true
+      },
+      "notes": "Land the multiple, then stop. The renewal number is the reason this review exists."
+    }
+  ]
+}
